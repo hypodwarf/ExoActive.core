@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -7,6 +6,13 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace ExoActive
 {
+    /**
+     * The Attribute struct starts with a base value from a NamedValue object. Each Attribute is given a GUID upon
+     * creation and also maintains a version that increments whenever a change is made to the Attribute. The attribute
+     * value can then be altered by inserting, updating and removing other Attribute objects. However, inserting
+     * multiple Attributes with the same GUID is not allowed. This creates a tree structure that represents the
+     * temporary changes to the base value.
+     */
     public readonly struct Attribute<T>
     {
         public readonly NamedValue<T> namedValue;
@@ -15,12 +21,20 @@ namespace ExoActive
         public readonly Guid guid;
         public readonly ulong version;
 
-        public Attribute(string name, T baseValue): this(new NamedValue<T>(name, baseValue)) { }
-        
-        public Attribute(NamedValue<T> namedValue): this(namedValue, System.Array.Empty<Attribute<T>>(), Guid.NewGuid(), 0) { }
-        
-        private Attribute(Attribute<T> attribute, Attribute<T>[] modifiers) : this(attribute.namedValue, modifiers, attribute.guid, attribute.version + 1) { }
-        
+        public Attribute(string name, T baseValue) : this(new NamedValue<T>(name, baseValue))
+        {
+        }
+
+        public Attribute(NamedValue<T> namedValue) : this(namedValue, Array.Empty<Attribute<T>>(),
+            Guid.NewGuid(), 0)
+        {
+        }
+
+        private Attribute(Attribute<T> attribute, Attribute<T>[] modifiers) : this(attribute.namedValue, modifiers,
+            attribute.guid, attribute.version + 1)
+        {
+        }
+
         private Attribute(NamedValue<T> namedValue, Attribute<T>[] modifiers, Guid guid, ulong version)
         {
             this.namedValue = namedValue;
@@ -35,12 +49,9 @@ namespace ExoActive
         {
             var i = 0;
             for (; i < modifiers.Length; i++)
-            {
                 if (modifiers[i].guid.Equals(modifier.guid))
-                {
                     return i;
-                }
-            }
+
             return -1;
         }
 
@@ -48,30 +59,30 @@ namespace ExoActive
         {
             // Do not allow self insertion
             // if (this.guid.Equals(modifier.guid)) return this;
-            
-            Attribute<T>[] updatedModifiers = new Attribute<T>[modifiers.Length + 1];
+
+            var updatedModifiers = new Attribute<T>[modifiers.Length + 1];
             modifiers.CopyTo(updatedModifiers, 0);
             updatedModifiers[^1] = modifier;
             return new Attribute<T>(this, updatedModifiers);
         }
-        
+
         public Attribute<T> InsertModifier(Attribute<T> modifier)
         {
             var i = GetModifierIdx(modifier);
             return i < 0 ? InsertModifierAtEnd(modifier) : this;
         }
-        
+
         private Attribute<T> UpdateModifierAtIdx(Attribute<T> modifier, int idx)
         {
             // Don't update if the modifier hasn't changed
             if (modifier.Equals(modifiers[idx])) return this;
-            
-            Attribute<T>[] updatedModifiers = new Attribute<T>[modifiers.Length];
+
+            var updatedModifiers = new Attribute<T>[modifiers.Length];
             modifiers.CopyTo(updatedModifiers, 0);
             updatedModifiers[idx] = modifier;
             return new Attribute<T>(this, updatedModifiers);
         }
-        
+
         public Attribute<T> UpdateModifier(Attribute<T> modifier)
         {
             var i = GetModifierIdx(modifier);
@@ -86,38 +97,34 @@ namespace ExoActive
 
         private Attribute<T> RemoveModifierAtIdx(int idx)
         {
-            Attribute<T>[] updatedModifiers = new Attribute<T>[modifiers.Length - 1];
+            var updatedModifiers = new Attribute<T>[modifiers.Length - 1];
             modifiers[..idx].CopyTo(updatedModifiers, 0);
-            modifiers[(idx+1)..].CopyTo(updatedModifiers, idx);
-            return  new Attribute<T>(this, updatedModifiers);
+            modifiers[(idx + 1)..].CopyTo(updatedModifiers, idx);
+            return new Attribute<T>(this, updatedModifiers);
         }
-        
+
         public Attribute<T> RemoveModifier(Attribute<T> modifier)
         {
             var i = GetModifierIdx(modifier);
             return i < 0 ? this : RemoveModifierAtIdx(i);
         }
 
-        public ReadOnlyCollection<Attribute<T>> Modifiers => new ReadOnlyCollection<Attribute<T>>(modifiers);
+        public ReadOnlyCollection<Attribute<T>> Modifiers => new(modifiers);
     }
-    
+
     public readonly struct AttributeHelper
     {
-        private static readonly Hashtable registeredAttributes = new Hashtable();
+        private static readonly Hashtable registeredAttributes = new();
+
         public static void PrintAttributeTree<T>(Attribute<T> attribute, int depth = 0)
         {
             var indent = "";
-            for (int i = 0; i < depth; i++)
-            {
-                indent += " ";
-            }
-            
-            Console.WriteLine($"{indent}{attribute.namedValue.name} : {attribute.namedValue.value} - {attribute.modifiedValue.value} {{{attribute.guid} : {attribute.version}}}");
+            for (var i = 0; i < depth; i++) indent += " ";
 
-            foreach (var child in attribute.Modifiers)
-            {
-                PrintAttributeTree<T>(child, depth + 1);
-            }
+            Console.WriteLine(
+                $"{indent}{attribute.namedValue.name} : {attribute.namedValue.value} - {attribute.modifiedValue.value} {{{attribute.guid} : {attribute.version}}}");
+
+            foreach (var child in attribute.Modifiers) PrintAttributeTree<T>(child, depth + 1);
         }
 
         public static void RegisterAttribute<T>(Attribute<T> attribute)
@@ -153,7 +160,7 @@ namespace ExoActive
 
             return new NamedValue<T>($"{lv.name} + {rv.name}", value);
         }
-        
+
         public static NamedValue<T> operator -(NamedValue<T> lv, NamedValue<T> rv)
         {
             T value;
@@ -170,7 +177,7 @@ namespace ExoActive
 
             return new NamedValue<T>($"{lv.name} - {rv.name}", value);
         }
-        
+
         public static NamedValue<T> operator *(NamedValue<T> lv, NamedValue<T> rv)
         {
             T value;
@@ -187,7 +194,7 @@ namespace ExoActive
 
             return new NamedValue<T>($"{lv.name} * {rv.name}", value);
         }
-        
+
         public static NamedValue<T> operator /(NamedValue<T> lv, NamedValue<T> rv)
         {
             T value;

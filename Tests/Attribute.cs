@@ -121,7 +121,7 @@ namespace Tests
 
             var root2 = root1.RemoveModifier(w2);
             Assert.AreEqual(6f, root2.modifiedValue.value);
-            
+
             var root3 = root1.RemoveModifier(z2);
             Assert.AreEqual(5f, root3.modifiedValue.value);
         }
@@ -150,7 +150,7 @@ namespace Tests
             var w3 = w.InsertModifier(v);
             var root2 = root1.UpdateModifier(w3);
             Assert.AreEqual(8f, root2.modifiedValue.value);
-            
+
             var z3 = z.InsertModifier(y);
             var root3 = root1.UpdateModifier(z3);
             Assert.AreEqual(7f, root3.modifiedValue.value);
