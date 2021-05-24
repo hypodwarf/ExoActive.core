@@ -47,7 +47,7 @@ namespace ExoActive
         private Attribute<T> InsertModifierAtEnd(Attribute<T> modifier)
         {
             // Do not allow self insertion
-            if (this.guid.Equals(modifier.guid)) return this;
+            // if (this.guid.Equals(modifier.guid)) return this;
             
             Attribute<T>[] updatedModifiers = new Attribute<T>[modifiers.Length + 1];
             modifiers.CopyTo(updatedModifiers, 0);

@@ -68,20 +68,6 @@ namespace Tests
         }
 
         [Test]
-        public void CanInsertDuplicateChildren()
-        {
-            var x = new Attribute<float>("x", 1);
-            var y = new Attribute<float>("y", 1);
-            var z = new Attribute<float>("z", 1);
-
-            var y1 = y.InsertModifier(x);
-            var z1 = z.InsertModifier(y);
-
-            Assert.AreNotEqual(z1, z1.InsertModifier(y));
-            Assert.AreNotEqual(z1, z1.InsertModifier(y1));
-        }
-        
-        [Test]
         public void CannotInsertDuplicateChildren()
         {
             var x = new Attribute<float>("x", 1);
@@ -104,29 +90,70 @@ namespace Tests
             Assert.AreEqual(2f, z1.modifiedValue.value);
 
             var z2 = z1.InsertModifier(z);
-            // This doesn't change the attr
+            // This doesn't change the attr because z1 already has a 'z' child
             Assert.AreEqual(z1, z2);
 
             var z3 = z.InsertModifier(z1);
             // This does change the attr
             Assert.AreNotEqual(z1, z3);
-
-            // This demonstrates a lack of the commutative property which is not intuative. 
         }
 
         [Test]
-        public void CannotInsertSelfAsChild()
+        public void CanRemoveChild()
         {
+            var a = new Attribute<float>("a", 1);
+            var u = new Attribute<float>("u", 2);
+            var v = new Attribute<float>("v", 1);
+            var w = new Attribute<float>("w", 1);
+            var x = new Attribute<float>("x", 3);
+            var y = new Attribute<float>("y", 1);
             var z = new Attribute<float>("z", 1);
-            var z1 = z.InsertModifier(z);
 
-            Assert.AreEqual(1f, z1.modifiedValue.value);
+            var v2 = v.InsertModifier(u);
+            var w2 = w.InsertModifier(v2);
+            var y2 = y.InsertModifier(x);
+            var z2 = z.InsertModifier(y2);
+            var root1 = a
+                .InsertModifier(w2)
+                .InsertModifier(z2);
 
-            var z2 = z1.InsertModifier(z);
-            Assert.AreEqual(z1, z2);
+            Assert.AreEqual(10f, root1.modifiedValue.value);
 
-            var z3 = z.InsertModifier(z1);
-            Assert.AreEqual(z1, z3);
+            var root2 = root1.RemoveModifier(w2);
+            Assert.AreEqual(6f, root2.modifiedValue.value);
+            
+            var root3 = root1.RemoveModifier(z2);
+            Assert.AreEqual(5f, root3.modifiedValue.value);
+        }
+
+        [Test]
+        public void CanUpdateChild()
+        {
+            var a = new Attribute<float>("a", 1);
+            var u = new Attribute<float>("u", 2);
+            var v = new Attribute<float>("v", 1);
+            var w = new Attribute<float>("w", 1);
+            var x = new Attribute<float>("x", 3);
+            var y = new Attribute<float>("y", 1);
+            var z = new Attribute<float>("z", 1);
+
+            var v2 = v.InsertModifier(u);
+            var w2 = w.InsertModifier(v2);
+            var y2 = y.InsertModifier(x);
+            var z2 = z.InsertModifier(y2);
+            var root1 = a
+                .InsertModifier(w2)
+                .InsertModifier(z2);
+
+            Assert.AreEqual(10f, root1.modifiedValue.value);
+
+            var w3 = w.InsertModifier(v);
+            var root2 = root1.UpdateModifier(w3);
+            Assert.AreEqual(8f, root2.modifiedValue.value);
+            
+            var z3 = z.InsertModifier(y);
+            var root3 = root1.UpdateModifier(z3);
+            Assert.AreEqual(7f, root3.modifiedValue.value);
         }
     }
 }
