@@ -40,7 +40,7 @@ namespace ExoActive
             this.namedValue = namedValue;
             this.modifiers = modifiers;
 
-            modifiedValue = modifiers.Aggregate(namedValue, (value, attribute) => value + attribute.modifiedValue);
+            this.modifiedValue = modifiers.Aggregate(namedValue, (value, attribute) => value + attribute.modifiedValue);
             this.guid = guid;
             this.version = version;
         }
@@ -114,8 +114,6 @@ namespace ExoActive
 
     public readonly struct AttributeHelper
     {
-        private static readonly Hashtable registeredAttributes = new();
-
         public static void PrintAttributeTree<T>(Attribute<T> attribute, int depth = 0)
         {
             var indent = "";
@@ -125,11 +123,6 @@ namespace ExoActive
                 $"{indent}{attribute.namedValue.name} : {attribute.namedValue.value} - {attribute.modifiedValue.value} {{{attribute.guid} : {attribute.version}}}");
 
             foreach (var child in attribute.Modifiers) PrintAttributeTree<T>(child, depth + 1);
-        }
-
-        public static void RegisterAttribute<T>(Attribute<T> attribute)
-        {
-            registeredAttributes[attribute.guid] = attribute;
         }
     }
 

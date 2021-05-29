@@ -6,11 +6,6 @@ namespace Tests
 {
     public class AttributeTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public void CanCreate()
         {
@@ -68,7 +63,7 @@ namespace Tests
         }
 
         [Test]
-        public void CannotInsertDuplicateChildren()
+        public void CannotInsertDuplicateChild()
         {
             var x = new Attribute<float>("x", 1);
             var y = new Attribute<float>("y", 1);
