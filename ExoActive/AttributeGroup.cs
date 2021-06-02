@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace ExoActive
 {
+    public class Attributes : AttributeGroup<Enum, int>
+    {
+    }
+
     public class AttributeGroup<S, T>
     {
         private readonly Dictionary<S, Attribute<T>> attributes = new Dictionary<S, Attribute<T>>();

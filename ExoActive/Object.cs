@@ -7,17 +7,17 @@ namespace ExoActive
 {
     public class Object
     {
-        private SC glass = new SC();
-        private AttributeGroup<Enum, int> attributes = new AttributeGroup<Enum, int>();
+        private List<State> states = new List<State>();
+        private Attributes attributes = new Attributes();
 
         // public IEnumerable<Enum> GetTriggers()
         // {
         //     return glass.PermittedTriggers;
         // }
-
-        public Enum GetState()
-        {
-            return glass.CurrentState;
-        }
+        //
+        // public Enum GetState()
+        // {
+        //     return glass.CurrentState;
+        // }
     }
 }
