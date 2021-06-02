@@ -1,23 +1,42 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Stateless;
 
 namespace ExoActive
 {
     public class Object
     {
-        private List<State> states = new List<State>();
-        private Attributes attributes = new Attributes();
+        protected readonly ISet<State> states = new HashSet<State>();
+        protected readonly Attributes attributes = new Attributes();
+        protected readonly Characteristics characteristics = new Characteristics();
 
-        // public IEnumerable<Enum> GetTriggers()
-        // {
-        //     return glass.PermittedTriggers;
-        // }
-        //
-        // public Enum GetState()
-        // {
-        //     return glass.CurrentState;
-        // }
+        protected void AddState(State state)
+        {
+            states.Add(state);
+        }
+
+        protected void RemoveState(State state)
+        {
+            states.Remove(state);
+        }
+
+        public List<Enum> PermittedTriggers
+        {
+            get => states.Aggregate(new List<Enum>(), (triggers, state) =>
+            {
+                triggers.AddRange(state.PermittedTriggers);
+                return triggers;
+            });
+        }
+        
+        public Attributes Attributes
+        {
+            get => attributes;
+        }
+
+        public Characteristics Characteristics
+        {
+            get => characteristics;
+        }
     }
 }

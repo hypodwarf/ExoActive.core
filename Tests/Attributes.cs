@@ -1,4 +1,3 @@
-using System;
 using ExoActive;
 using NUnit.Framework;
 

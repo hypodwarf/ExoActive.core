@@ -63,5 +63,20 @@ namespace ExoActive
         {
             this.Name = Name;
         }
+
+        public sealed class TriggerWithParameters<T> : Stateless.StateMachine<Enum, Enum>.TriggerWithParameters<T>
+        {
+            public TriggerWithParameters(Enum underlyingTrigger) : base(underlyingTrigger) { }
+        }
+        
+        public sealed class TriggerWithParameters<T1,T2> : Stateless.StateMachine<Enum, Enum>.TriggerWithParameters<T1,T2>
+        {
+            public TriggerWithParameters(Enum underlyingTrigger) : base(underlyingTrigger) { }
+        }
+        
+        public sealed class TriggerWithParameters<T1,T2,T3> : Stateless.StateMachine<Enum, Enum>.TriggerWithParameters<T1,T2,T3>
+        {
+            public TriggerWithParameters(Enum underlyingTrigger) : base(underlyingTrigger) { }
+        }
     }
 }

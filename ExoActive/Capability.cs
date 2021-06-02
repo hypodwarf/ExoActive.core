@@ -4,5 +4,6 @@ namespace ExoActive
 {
     public class Capability
     {
+        
     }
 }
