@@ -10,12 +10,7 @@ namespace ExoActive
 
         private static (string, ulong) ParseEnum(Enum e)
         {
-            string key = e.GetType().FullName;
-            if (key == null)
-            {
-                throw new InvalidOperationException();
-            }
-
+            string key = Key(e.GetType());
             ulong value = Convert.ToUInt64(e);
             return (key, value);
         }
@@ -52,9 +47,17 @@ namespace ExoActive
             return (characteristicDict[key] & value) == value;
         }
 
+        private static string Key(Type E) => E.FullName ?? throw new InvalidOperationException();
+        private static string Key<E>() => Key(typeof(E));
+        public ulong Value<E>() => characteristicDict.GetValueOrDefault(Key<E>(), 0UL);
+        public ulong Value(Type E) => characteristicDict.GetValueOrDefault(Key(E), 0UL);
+
         public override string ToString()
         {
-            return characteristicDict.Aggregate("", (agg, kvp) => agg += (agg.Length > 0 ? ", " : "") + $"{{{kvp.Key}, {Convert.ToString((long)kvp.Value, 2)}}}");
+            return characteristicDict.Aggregate("", (agg, kvp) => 
+                agg + 
+                (agg.Length > 0 ? ", " : "") + 
+                $"{{{kvp.Key}, {Convert.ToString((long)kvp.Value, 2)}}}");
         }
     }
 }
