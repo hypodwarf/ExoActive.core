@@ -14,13 +14,13 @@ namespace ExoActive
 
         private delegate Attribute<T> AttributeAction(Attribute<T> a, Attribute<T> b);
 
-        public void AddAttribute(S type, T value = default, string name = null) =>
+        public void Add(S type, T value = default, string name = null) =>
             attributes.Add(type, new Attribute<T>(name ?? type.ToString(), value));
 
-        public void RemoveAttribute(S type) => 
+        public void Remove(S type) => 
             attributes.Remove(type);
 
-        public bool HasAttribute(S type) => 
+        public bool Has(S type) => 
             attributes.ContainsKey(type);
 
         public T GetAttributeValue(S type)
@@ -46,12 +46,12 @@ namespace ExoActive
             return failed;
         }
 
-        public List<S> ApplyModification(AttributeGroup<S, T> attributeGroup)
+        public List<S> Apply(AttributeGroup<S, T> attributeGroup)
         {
             return PerformActionOnGroup(attributeGroup, (a, b) => a.UpsertModifier(b));
         }
 
-        public List<S> RemoveModification(AttributeGroup<S, T> attributeGroup)
+        public List<S> Revert(AttributeGroup<S, T> attributeGroup)
         {
             return PerformActionOnGroup(attributeGroup, (a, b) => a.RemoveModifier(b));
         }

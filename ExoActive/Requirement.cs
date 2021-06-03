@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace ExoActive
 {
@@ -78,7 +79,7 @@ namespace ExoActive
 
         public bool Passes(Object obj)
         {
-            return obj.PermittedTriggers.Contains(Trigger) == Permitted;
+            return obj.PermittedTriggers().Contains(Trigger) == Permitted;
         }
     }
 }
