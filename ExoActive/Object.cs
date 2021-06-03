@@ -4,21 +4,11 @@ using System.Linq;
 
 namespace ExoActive
 {
-    public class Object
+    public abstract class Object
     {
         protected readonly ISet<State> states = new HashSet<State>();
         protected readonly Attributes attributes = new Attributes();
         protected readonly Characteristics characteristics = new Characteristics();
-
-        protected void AddState(State state)
-        {
-            states.Add(state);
-        }
-
-        protected void RemoveState(State state)
-        {
-            states.Remove(state);
-        }
 
         public List<Enum> PermittedTriggers
         {
