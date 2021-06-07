@@ -6,34 +6,15 @@ namespace ExoActive
     public interface IRequirement
     {
         public bool Passes(Object obj);
+        public delegate bool Check(Object obj);
     }
-
-    public class Requirement
-    {
-        private readonly Object obj;
-        private readonly IRequirement requirement;
-
-        public Requirement(Object obj, IRequirement requirement)
-        {
-            this.obj = obj;
-            this.requirement = requirement;
-        }
-
-        private bool Value
-        {
-            get => requirement.Passes(obj);
-        }
-
-        public static implicit operator bool(Requirement req) => req.Value;
-    }
-    
 
     public class CharacteristicRequirement : IRequirement
     {
         private readonly Enum Characteristic;
         private readonly bool RequiredValue;
 
-        public CharacteristicRequirement(Enum characteristic, bool requiredValue = true)
+        private CharacteristicRequirement(Enum characteristic, bool requiredValue = true)
         {
             Characteristic = characteristic;
             RequiredValue = requiredValue;
@@ -42,6 +23,12 @@ namespace ExoActive
         public bool Passes(Object obj)
         {
             return obj.Characteristics.Has(Characteristic) == RequiredValue;
+        }
+
+        static public IRequirement.Check Create(Enum characteristic, bool requiredValue = true)
+        {
+            var req = new CharacteristicRequirement(characteristic, requiredValue);
+            return obj => req.Passes(obj);
         }
     }
 
@@ -53,7 +40,7 @@ namespace ExoActive
         private readonly int Threshold;
         private readonly Evaluate Evaluation;
 
-        public AttributeRequirement(Enum attribute, int threshold, Evaluate evaluation)
+        private AttributeRequirement(Enum attribute, int threshold, Evaluate evaluation)
         {
             Attribute = attribute;
             Threshold = threshold;
@@ -64,6 +51,12 @@ namespace ExoActive
         {
             return Evaluation(obj.Attributes.GetAttributeValue(Attribute), Threshold);
         }
+        
+        static public IRequirement.Check Create(Enum attribute, int threshold, Evaluate evaluation)
+        {
+            var req = new AttributeRequirement(attribute, threshold, evaluation);
+            return obj => req.Passes(obj);
+        }
     }
 
     public class StateRequirement : IRequirement
@@ -71,7 +64,7 @@ namespace ExoActive
         private Enum Trigger;
         private bool Permitted;
 
-        public StateRequirement(Enum trigger, bool permitted = true)
+        private StateRequirement(Enum trigger, bool permitted = true)
         {
             Trigger = trigger;
             Permitted = permitted;
@@ -79,7 +72,13 @@ namespace ExoActive
 
         public bool Passes(Object obj)
         {
-            return obj.PermittedTriggers().Contains(Trigger) == Permitted;
+            return obj.IsPermittedTrigger(Trigger) == Permitted;
+        }
+        
+        static public IRequirement.Check Create(Enum trigger, bool permitted = true)
+        {
+            var req = new StateRequirement(trigger, permitted);
+            return obj => req.Passes(obj);
         }
     }
 }
