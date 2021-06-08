@@ -6,7 +6,7 @@ namespace ExoActive
 {
     public abstract class Object
     {
-        protected readonly IDictionary<Enum, Capability> capabilities = new Dictionary<Enum, Capability>();
+        // protected readonly IDictionary<Enum, Capability> capabilities = new Dictionary<Enum, Capability>();
         protected readonly IDictionary<Enum, State> states = new Dictionary<Enum, State>();
         protected readonly Attributes attributes = new Attributes();
         protected readonly Characteristics characteristics = new Characteristics();
@@ -30,15 +30,15 @@ namespace ExoActive
             return states.Values.Any(state => state.PermittedTriggers.Contains(trigger));
         }
 
-        public IEnumerable<Enum> Capabilities()
-        {
-            return capabilities.Keys;
-        }
-
-        public Capability Capabilities(Enum id)
-        {
-            return capabilities[id];
-        }
+        // public IEnumerable<Enum> Capabilities()
+        // {
+        //     return capabilities.Keys;
+        // }
+        //
+        // public Capability Capabilities(Enum id)
+        // {
+        //     return capabilities[id];
+        // }
 
         public State State(Enum stateId)
         {
@@ -55,9 +55,9 @@ namespace ExoActive
             get => characteristics;
         }
 
-        public bool PerformCapability(Enum capabilityId)
-        {
-            return Capabilities(capabilityId).Perform(this);
-        }
+        // public bool PerformCapability(Enum capabilityId)
+        // {
+        //     return Capabilities(capabilityId).Perform(this);
+        // }
     }
 }

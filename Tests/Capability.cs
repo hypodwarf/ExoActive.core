@@ -1,34 +1,49 @@
+using System.Collections.Generic;
 using System.Linq;
 using ExoActive;
 using NUnit.Framework;
 
 namespace Tests
 {
-    public class TestCapabilityFill : Capability
+    public class TestCapabilityActionFill : CapabilityAction
     {
-        public TestCapabilityFill() : base(false, false)
+        public TestCapabilityActionFill()
         {
-           OwnerRequirements.Add(RequirementTest.CanFill);
+           Requirements.Add(RequirementTest.CanFill);
         }
 
-        protected override bool Action(Object owner, Object target = null)
+        public override void PerformAction(Object obj)
         {
-            owner.State(TestObj.States.Cup).Fire(Cup.Trigger.Fill);
-            return true;
+            obj.State(TestObj.States.Cup).Fire(Cup.Trigger.Fill);
         }
     }
     
-    public class TestCapabilityDrink : Capability
+    public class TestCapabilityActionDrink : CapabilityAction
     {
-        public TestCapabilityDrink() : base(false, false)
+        public TestCapabilityActionDrink()
         {
-            OwnerRequirements.Add(RequirementTest.CanDrink);
+            Requirements.Add(RequirementTest.CanDrink);
         }
 
-        protected override bool Action(Object owner, Object target = null)
+        public override void PerformAction(Object obj)
         {
-            owner.State(TestObj.States.Cup).Fire(Cup.Trigger.Drink);
-            return true;
+            obj.State(TestObj.States.Cup).Fire(Cup.Trigger.Drink);
+        }
+    }
+
+    public class TestCapabilityDrink : Capabilty
+    {
+        public TestCapabilityDrink()
+        {
+            actorActions.Add(new TestCapabilityActionDrink());
+        }
+    }
+    
+    public class TestCapabilityFill : Capabilty
+    {
+        public TestCapabilityFill()
+        {
+            actorActions.Add(new TestCapabilityActionFill());
         }
     }
     
@@ -42,19 +57,34 @@ namespace Tests
         }
 
         [Test]
-        public void AttachedToObject()
+        public void CanPerformAction()
         {
             var obj = new TestObj();
+            var actors = new List<Object>{obj};
+            var fill = new TestCapabilityFill();
+            var drink = new TestCapabilityDrink();
             
             Assert.AreEqual(Cup.State.Empty, obj.State(TestObj.States.Cup).CurrentState);
-
-            Assert.Contains(TestObj.Capability.Fill, obj.Capabilities().ToList());
-            Assert.Contains(TestObj.Capability.Drink, obj.Capabilities().ToList());
             
-            Assert.True(obj.Capabilities(TestObj.Capability.Fill).CanPerform(obj));
-            Assert.False(obj.Capabilities(TestObj.Capability.Drink).CanPerform(obj));
+            Assert.False(drink.PerformAction(actors));
+            Assert.True(fill.PerformAction(actors));
             
+            Assert.AreEqual(Cup.State.HalfFull, obj.State(TestObj.States.Cup).CurrentState);
             
+            Assert.True(fill.PerformAction(actors));
+            
+            Assert.AreEqual(Cup.State.Full, obj.State(TestObj.States.Cup).CurrentState);
+            
+            Assert.False(fill.PerformAction(actors));
+            Assert.True(drink.PerformAction(actors));
+            
+            Assert.AreEqual(Cup.State.HalfFull, obj.State(TestObj.States.Cup).CurrentState);
+            
+            Assert.True(drink.PerformAction(actors));
+            
+            Assert.AreEqual(Cup.State.Empty, obj.State(TestObj.States.Cup).CurrentState);
         }
+        
+        
     }
 }

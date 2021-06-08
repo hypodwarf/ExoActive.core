@@ -3,56 +3,52 @@ using System.Linq;
 
 namespace ExoActive
 {
-    public abstract class Capability
+    
+    public interface ICapability
     {
-        // private Object owner;
-        protected readonly IList<IRequirement.Check> OwnerRequirements = new List<IRequirement.Check>();
-        protected readonly IList<IRequirement.Check> TargetRequirements = new List<IRequirement.Check>();
+        public bool PassesRequirements(List<Object> actors, List<Object> targets);
+        public bool PerformAction(List<Object> actors, List<Object> targets);
+    }
+    
+    public interface ICapabilityAction
+    {
+        public bool PassesRequirements(Object subject);
+        public void PerformAction(Object subject);
+    }
+    
+    public abstract class CapabilityAction: ICapabilityAction
+    {
+        protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
 
-        public Capability(bool requiresTarget, bool canTargetSelf)
+        public bool PassesRequirements(Object obj) => Requirements.All(req => req(obj));
+
+        public abstract void PerformAction(Object obj);
+    }
+    
+    public abstract class Capabilty: ICapability
+    {
+        protected readonly List<ICapabilityAction> actorActions = new List<ICapabilityAction>();
+        protected readonly List<ICapabilityAction> targetActions = new List<ICapabilityAction>();
+
+        public bool PassesRequirements(List<Object> actors, List<Object> targets = null)
         {
-            RequiresTarget = requiresTarget;
-            CanTargetSelf = canTargetSelf;
+            return actorActions.All(action => actors.All(action.PassesRequirements)) &&
+                   targetActions.All(action => (targets ?? new List<Object>()).All(action.PassesRequirements));
         }
 
-        public bool RequiresTarget { get; }
-        public bool CanTargetSelf{ get; }
-
-        Object ResolveTarget(Object owner, Object target = null)
+        public bool PerformAction(List<Object> actors, List<Object> targets = null)
         {
-            if (RequiresTarget)
+            if (PassesRequirements(actors, targets))
             {
-                if (target != null)
+                actorActions.ForEach(action => actors.ForEach(actor => action.PerformAction(actor)));
+                if (targets != null)
                 {
-                    return target;
+                    targetActions.ForEach(action => targets.ForEach(target => action.PerformAction(target)));
                 }
-                
-                if (CanTargetSelf)
-                {
-                    return owner;
-                }
+                return true;
             }
-            return null;
-        }
-        
-        public bool CanPerform(Object owner, Object target = null)
-        {
-            return _canPerform(owner, ResolveTarget(owner, target));
-        }
 
-        private bool _canPerform(Object owner, Object resolvedTarget)
-        {
-            bool ownerCanPerform = OwnerRequirements.All(req => req(owner));
-            bool targetCanPerform = resolvedTarget != null ? TargetRequirements.All(req => req(resolvedTarget)) : !RequiresTarget;
-            return ownerCanPerform && targetCanPerform;
-        }
-
-        protected abstract bool Action(Object owner, Object target = null);
-
-        public bool Perform(Object owner, Object target = null)
-        {
-            Object resolvedTarget = ResolveTarget(owner, target);
-            return _canPerform(owner, resolvedTarget) && Action(owner, resolvedTarget);
+            return false;
         }
     }
 }
