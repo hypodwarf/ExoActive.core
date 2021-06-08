@@ -54,7 +54,8 @@ namespace Tests
         public enum Trigger
         {
             Fill,
-            Drink
+            Drink,
+            Evaporate
         }
         
         public override Array States { get => Enum.GetValues(typeof(State)); }
@@ -71,6 +72,14 @@ namespace Tests
             return Amount >= 100 ? State.Full : Amount <= 0 ? State.Empty : State.HalfFull;
         }
 
+        protected override void OnTickEvent()
+        {
+            if (CanFire(Trigger.Evaporate))
+            {
+                Fire(Trigger.Evaporate);
+            }
+        }
+
         public DynamicCup(State? initialState = null) : base(initialState ?? State.Empty)
         {
             Configure(State.Empty)
@@ -78,10 +87,14 @@ namespace Tests
             
             Configure(State.HalfFull)
                 .PermitDynamic(FillSome, i => nextState(i))
-                .PermitDynamic(DrinkSome, i => nextState(-i));
+                .PermitDynamic(DrinkSome, i => nextState(-i))
+                .PermitDynamicIf(Trigger.Evaporate, () => nextState(
+                    -(int)(TimeTicker.Ticks - lastTransitionTick)), () => TimeTicker.Ticks > lastTransitionTick);
             
             Configure(State.Full)
-                .PermitDynamic(DrinkSome, i => nextState(-i));
+                .PermitDynamic(DrinkSome, i => nextState(-i))
+                .PermitDynamicIf(Trigger.Evaporate, () => nextState(
+                    -(int)(TimeTicker.Ticks - lastTransitionTick)), () => TimeTicker.Ticks > lastTransitionTick);
         }
     }
     
@@ -132,23 +145,45 @@ namespace Tests
         public void StateTransitionEvent()
         {
             var cup = new DynamicCup();
-            int transCount = 0;
             int transCompleteCount = 0;
-            cup.OnTransition += _ => transCount++;
-            cup.OnTransitionComplete += _ => transCompleteCount++;
+            cup.OnTransitionCompleted += _ => transCompleteCount++;
             
             cup.Fire(DynamicCup.FillSome, 25);
-            Assert.AreEqual(1, transCount);
             Assert.AreEqual(1, transCompleteCount);
             cup.Fire(DynamicCup.FillSome, 25);
-            Assert.AreEqual(2, transCount);
             Assert.AreEqual(2, transCompleteCount);
             cup.Fire(DynamicCup.DrinkSome, 25);
-            Assert.AreEqual(3, transCount);
             Assert.AreEqual(3, transCompleteCount);
             cup.Fire(DynamicCup.DrinkSome, 25);
-            Assert.AreEqual(4, transCount);
             Assert.AreEqual(4, transCompleteCount);
+        }
+        
+        [Test]
+        public void StateTime()
+        {
+            var cup = new DynamicCup();
+
+            Assert.AreEqual(0, TimeTicker.Ticks);
+            Assert.AreEqual(0, cup.lastTransitionTick);
+            
+            TimeTicker.AddTicks(100);
+            Assert.AreEqual(100, TimeTicker.Ticks);
+            Assert.AreEqual(0, cup.lastTransitionTick);
+            
+            TimeTicker.AddTicks(100);
+            
+            Assert.AreEqual(200, TimeTicker.Ticks);
+            Assert.AreEqual(0, cup.lastTransitionTick);
+            
+            cup.Fire(DynamicCup.FillSome, 25);
+            Assert.AreEqual(25, cup.Amount);
+            
+            Assert.AreEqual(200, TimeTicker.Ticks);
+            Assert.AreEqual(200, cup.lastTransitionTick);
+            
+            TimeTicker.AddTicks(1);
+            
+            Assert.AreEqual(24, cup.Amount);
         }
     }
 }

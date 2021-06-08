@@ -10,24 +10,29 @@ namespace ExoActive
         public abstract Array States { get; }
         public abstract Array Triggers { get; }
         public delegate void Transitioned(Transition transInfo);
-        public event Transitioned OnTransitionComplete; 
-        public event Transitioned OnTransition; 
-
-        public override string ToString()
-        {
-            return Stateless.Graph.UmlDotGraph.Format(GetInfo());
-        }
+        public new event Transitioned OnTransitionCompleted;
 
         protected StateMachine(S initialState) : base(initialState)
         {
-            OnTransitionCompleted(t => OnTransitionComplete?.Invoke(t));
-            OnTransitioned(t => OnTransition?.Invoke(t));
+            base.OnTransitionCompleted(t => OnTransitionCompleted?.Invoke(t));
         }
     }
 
     public abstract class State : StateMachine<Enum, Enum>
-    { 
+    {
+        public ulong lastTransitionTick { get; protected set; }
+
+        protected virtual void OnTickEvent() {}
+
+        private void TransitionHandler(Transition transInfo)
+        {
+            lastTransitionTick = TimeTicker.Ticks;
+        }
+
         protected State(Enum initialState) : base(initialState)
-        {}
+        {
+            OnTransitionCompleted += TransitionHandler;
+            TimeTicker.TickEvent += OnTickEvent;
+        }
     }
 }
