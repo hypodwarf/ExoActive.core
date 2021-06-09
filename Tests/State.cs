@@ -24,7 +24,9 @@ namespace Tests
 
         public int Amount { get; private set; }
 
-        public Cup(State? initialState = null) : base(initialState ?? State.Empty)
+        public Cup() : this(State.Empty) { }
+
+        public Cup(State initialState) : base(initialState)
         {
             Configure(State.Empty)
                 .OnEntry(() => Amount = 0)
@@ -80,7 +82,9 @@ namespace Tests
             }
         }
 
-        public DynamicCup(State? initialState = null) : base(initialState ?? State.Empty)
+        public DynamicCup() : this(State.Empty) { }
+
+        public DynamicCup(State initialState) : base(initialState)
         {
             Configure(State.Empty)
                 .PermitDynamic(FillSome, i => nextState(i));

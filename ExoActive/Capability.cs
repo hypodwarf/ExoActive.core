@@ -17,13 +17,18 @@ namespace ExoActive
         public void PerformAction(Object subject);
     }
     
-    public abstract class CapabilityAction: ICapabilityAction
+    public abstract class CapabilityAction<S> : ICapabilityAction where S : State, new()
     {
         protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
-        
-        protected abstract String StateId { get; }
 
-        protected abstract State CreateState();
+        private static String StateId { get => typeof(S).FullName; }
+
+        protected virtual S CreateState()
+        {
+            return new S();
+        }
+
+        protected State GetState(Object obj) => obj.State(StateId);
 
         public bool PassesRequirements(Object obj)
         {

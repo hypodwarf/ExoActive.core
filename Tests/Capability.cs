@@ -4,41 +4,29 @@ using NUnit.Framework;
 
 namespace Tests
 {
-    public class TestCapabilityActionFill : CapabilityAction
+    public class TestCapabilityActionFill : CapabilityAction<Cup>
     {
         public TestCapabilityActionFill()
         {
            Requirements.Add(RequirementTest.CanFill);
         }
 
-        protected override string StateId { get => typeof(Cup).FullName; }
-        protected override State CreateState()
-        {
-            return new Cup();
-        }
-
         public override void PerformAction(Object obj)
         {
-            obj.State(StateId).Fire(Cup.Trigger.Fill);
+            GetState(obj).Fire(Cup.Trigger.Fill);
         }
     }
     
-    public class TestCapabilityActionDrink : CapabilityAction
+    public class TestCapabilityActionDrink : CapabilityAction<Cup>
     {
         public TestCapabilityActionDrink()
         {
             Requirements.Add(RequirementTest.CanDrink);
         }
-        
-        protected override string StateId { get => typeof(Cup).FullName; }
-        protected override State CreateState()
-        {
-            return new Cup();
-        }
 
         public override void PerformAction(Object obj)
         {
-            obj.State(StateId).Fire(Cup.Trigger.Drink);
+            GetState(obj).Fire(Cup.Trigger.Drink);
         }
     }
 
