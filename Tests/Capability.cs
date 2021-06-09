@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
 using ExoActive;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Tests
 {

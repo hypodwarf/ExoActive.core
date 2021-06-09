@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 namespace ExoActive
 {
@@ -61,8 +60,8 @@ namespace ExoActive
 
     public class StateRequirement : IRequirement
     {
-        private Enum Trigger;
-        private bool Permitted;
+        private readonly Enum Trigger;
+        private readonly bool Permitted;
 
         private StateRequirement(Enum trigger, bool permitted = true)
         {
