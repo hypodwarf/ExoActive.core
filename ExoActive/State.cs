@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ExoActive
 {
@@ -20,13 +18,15 @@ namespace ExoActive
 
     public abstract class State : StateMachine<Enum, Enum>
     {
-        public ulong lastTransitionTick { get; protected set; }
+        public string ID { get => GetType().FullName; }
+        
+        public ulong LastTransitionTick { get; private set; }
 
         protected virtual void OnTickEvent() {}
 
         private void TransitionHandler(Transition transInfo)
         {
-            lastTransitionTick = TimeTicker.Ticks;
+            LastTransitionTick = TimeTicker.Ticks;
         }
 
         protected State(Enum initialState) : base(initialState)

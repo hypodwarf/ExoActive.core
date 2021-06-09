@@ -89,12 +89,12 @@ namespace Tests
                 .PermitDynamic(FillSome, i => nextState(i))
                 .PermitDynamic(DrinkSome, i => nextState(-i))
                 .PermitDynamicIf(Trigger.Evaporate, () => nextState(
-                    -(int)(TimeTicker.Ticks - lastTransitionTick)), () => TimeTicker.Ticks > lastTransitionTick);
+                    -(int)(TimeTicker.Ticks - LastTransitionTick)), () => TimeTicker.Ticks > LastTransitionTick);
             
             Configure(State.Full)
                 .PermitDynamic(DrinkSome, i => nextState(-i))
                 .PermitDynamicIf(Trigger.Evaporate, () => nextState(
-                    -(int)(TimeTicker.Ticks - lastTransitionTick)), () => TimeTicker.Ticks > lastTransitionTick);
+                    -(int)(TimeTicker.Ticks - LastTransitionTick)), () => TimeTicker.Ticks > LastTransitionTick);
         }
     }
     
@@ -104,6 +104,7 @@ namespace Tests
         public void FireEmptyTriggers()
         {
             var cup = new Cup();
+            
             Assert.AreEqual(0, cup.Amount);
             Assert.AreEqual(Cup.State.Empty, cup.CurrentState);
             cup.Fire(Cup.Trigger.Fill);
@@ -164,22 +165,22 @@ namespace Tests
             var cup = new DynamicCup();
 
             Assert.AreEqual(0, TimeTicker.Ticks);
-            Assert.AreEqual(0, cup.lastTransitionTick);
+            Assert.AreEqual(0, cup.LastTransitionTick);
             
             TimeTicker.AddTicks(100);
             Assert.AreEqual(100, TimeTicker.Ticks);
-            Assert.AreEqual(0, cup.lastTransitionTick);
+            Assert.AreEqual(0, cup.LastTransitionTick);
             
             TimeTicker.AddTicks(100);
             
             Assert.AreEqual(200, TimeTicker.Ticks);
-            Assert.AreEqual(0, cup.lastTransitionTick);
+            Assert.AreEqual(0, cup.LastTransitionTick);
             
             cup.Fire(DynamicCup.FillSome, 25);
             Assert.AreEqual(25, cup.Amount);
             
             Assert.AreEqual(200, TimeTicker.Ticks);
-            Assert.AreEqual(200, cup.lastTransitionTick);
+            Assert.AreEqual(200, cup.LastTransitionTick);
             
             TimeTicker.AddTicks(1);
             

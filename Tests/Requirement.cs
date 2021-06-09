@@ -55,17 +55,19 @@ namespace Tests
         [Test]
         public void StateReqs()
         {
+            var cupId = typeof(Cup).FullName;
             var obj = new TestObj();
+            obj.AddState(new Cup());
 
             Assert.True(CanFill(obj));
             Assert.False(CanDrink(obj));
             
-            obj.State(TestObj.States.Cup).Fire(Cup.Trigger.Fill);
+            obj.State(cupId).Fire(Cup.Trigger.Fill);
             
             Assert.True(CanFill(obj));
             Assert.True(CanDrink(obj));
             
-            obj.State(TestObj.States.Cup).Fire(Cup.Trigger.Fill);
+            obj.State(cupId).Fire(Cup.Trigger.Fill);
             
             Assert.False(CanFill(obj));
             Assert.True(CanDrink(obj));

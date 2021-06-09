@@ -7,7 +7,7 @@ namespace ExoActive
     public abstract class Object
     {
         // protected readonly IDictionary<Enum, Capability> capabilities = new Dictionary<Enum, Capability>();
-        protected readonly IDictionary<Enum, State> states = new Dictionary<Enum, State>();
+        protected readonly IDictionary<string, State> states = new Dictionary<string, State>();
         protected readonly Attributes attributes = new Attributes();
         protected readonly Characteristics characteristics = new Characteristics();
 
@@ -40,9 +40,19 @@ namespace ExoActive
         //     return capabilities[id];
         // }
 
-        public State State(Enum stateId)
+        public void AddState(State state)
+        {
+            states.Add(state.ID, state);
+        }
+
+        public State State(string stateId)
         {
             return states[stateId];
+        }
+        
+        public bool HasState(string stateId)
+        {
+            return states.ContainsKey(stateId);
         }
 
         public Attributes Attributes

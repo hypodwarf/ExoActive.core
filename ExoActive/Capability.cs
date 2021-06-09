@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ExoActive
@@ -19,8 +20,19 @@ namespace ExoActive
     public abstract class CapabilityAction: ICapabilityAction
     {
         protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
+        
+        protected abstract String StateId { get; }
 
-        public bool PassesRequirements(Object obj) => Requirements.All(req => req(obj));
+        protected abstract State CreateState();
+
+        public bool PassesRequirements(Object obj)
+        {
+            if (!obj.HasState(StateId))
+            {
+                obj.AddState(CreateState());
+            }
+            return Requirements.All(req => req(obj));
+        }
 
         public abstract void PerformAction(Object obj);
     }
@@ -40,10 +52,10 @@ namespace ExoActive
         {
             if (PassesRequirements(actors, targets))
             {
-                actorActions.ForEach(action => actors.ForEach(actor => action.PerformAction(actor)));
+                actorActions.ForEach(action => actors.ForEach(action.PerformAction));
                 if (targets != null)
                 {
-                    targetActions.ForEach(action => targets.ForEach(target => action.PerformAction(target)));
+                    targetActions.ForEach(action => targets.ForEach(action.PerformAction));
                 }
                 return true;
             }

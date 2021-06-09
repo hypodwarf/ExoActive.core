@@ -36,7 +36,6 @@ namespace Tests
             // capabilities.Add(Capability.Drink, new TestCapabilityDrink());
             characteristics.Add(ObjChar.Happy);
             attributes.Add(ObjAttr.Strength, 10);
-            states.Add(States.Cup, new Cup());
         }
     }
     
