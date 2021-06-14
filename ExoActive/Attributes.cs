@@ -1,6 +1,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace ExoActive
 {
@@ -8,13 +10,15 @@ namespace ExoActive
     {
     }
 
+    [DataContract]
     public class AttributeGroup<S, T>
     {
-        private readonly Dictionary<S, Attribute<T>> attributes = new Dictionary<S, Attribute<T>>();
+        [DataMember]
+        private Dictionary<S, Attribute<T>> attributes = new Dictionary<S, Attribute<T>>();
 
         private delegate Attribute<T> AttributeAction(Attribute<T> a, Attribute<T> b);
 
-        public void Add(S type, T value = default, string name = null) =>
+        public void Add(S type, T value = default, string name = null) => 
             attributes.Add(type, new Attribute<T>(name ?? type.ToString(), value));
 
         public void Remove(S type) => 
@@ -55,5 +59,24 @@ namespace ExoActive
         {
             return PerformActionOnGroup(attributeGroup, (a, b) => a.RemoveModifier(b));
         }
+
+        private sealed class DefaultEqualityComparer : IEqualityComparer<AttributeGroup<S, T>>
+        {
+            public bool Equals(AttributeGroup<S, T> x, AttributeGroup<S, T> y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return x.attributes.SequenceEqual(y.attributes);
+            }
+
+            public int GetHashCode(AttributeGroup<S, T> obj)
+            {
+                return (obj.attributes != null ? obj.attributes.GetHashCode() : 0);
+            }
+        }
+
+        public static IEqualityComparer<AttributeGroup<S, T>> DefaultComparer { get; } = new DefaultEqualityComparer();
     }
 }

@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using Microsoft.CSharp.RuntimeBinder;
 
 namespace ExoActive
@@ -12,12 +14,18 @@ namespace ExoActive
      * multiple Attributes with the same GUID is not allowed. This creates a tree structure that represents the
      * temporary changes to the base value.
      */
-    public readonly struct Attribute<T>
+    [DataContract]
+    public readonly struct Attribute<T> : IEquatable<Attribute<T>>
     {
+        [DataMember]
         public readonly NamedValue<T> namedValue;
+        [DataMember]
         private readonly Attribute<T>[] modifiers;
+        [DataMember]
         public readonly NamedValue<T> modifiedValue;
+        [DataMember]
         public readonly Guid guid;
+        [DataMember]
         public readonly ulong version;
 
         public Attribute(string name, T baseValue) : this(new NamedValue<T>(name, baseValue))
@@ -39,7 +47,7 @@ namespace ExoActive
             this.namedValue = namedValue;
             this.modifiers = modifiers;
 
-            this.modifiedValue = modifiers.Aggregate(namedValue, (value, attribute) => value + attribute.modifiedValue);
+            modifiedValue = modifiers.Aggregate(namedValue, (value, attribute) => value + attribute.modifiedValue);
             this.guid = guid;
             this.version = version;
         }
@@ -109,6 +117,35 @@ namespace ExoActive
         }
 
         public ReadOnlyCollection<Attribute<T>> Modifiers => new(modifiers);
+
+        public bool Equals(Attribute<T> other)
+        {
+            return namedValue.Equals(other.namedValue) 
+                   && modifiers.SequenceEqual(other.modifiers) 
+                   && modifiedValue.Equals(other.modifiedValue)
+                   && guid.Equals(other.guid) 
+                   && version == other.version;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Attribute<T> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(namedValue, modifiers, modifiedValue, guid, version);
+        }
+
+        public static bool operator ==(Attribute<T> left, Attribute<T> right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Attribute<T> left, Attribute<T> right)
+        {
+            return !left.Equals(right);
+        }
     }
 
     public readonly struct AttributeHelper
@@ -121,11 +158,11 @@ namespace ExoActive
             Console.WriteLine(
                 $"{indent}{attribute.namedValue.name} : {attribute.namedValue.value} - {attribute.modifiedValue.value} {{{attribute.guid} : {attribute.version}}}");
 
-            foreach (var child in attribute.Modifiers) PrintAttributeTree<T>(child, depth + 1);
+            foreach (var child in attribute.Modifiers) PrintAttributeTree(child, depth + 1);
         }
     }
 
-    public readonly struct NamedValue<T>
+    public readonly struct NamedValue<T> : IEquatable<NamedValue<T>>
     {
         public readonly string name;
         public readonly T value;
@@ -202,6 +239,31 @@ namespace ExoActive
             }
 
             return new NamedValue<T>($"{lv.name} / {rv.name}", value);
+        }
+
+        public bool Equals(NamedValue<T> other)
+        {
+            return name == other.name && EqualityComparer<T>.Default.Equals(value, other.value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is NamedValue<T> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(name, value);
+        }
+
+        public static bool operator ==(NamedValue<T> left, NamedValue<T> right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NamedValue<T> left, NamedValue<T> right)
+        {
+            return !left.Equals(right);
         }
     }
 }

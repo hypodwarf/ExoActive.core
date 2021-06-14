@@ -23,8 +23,9 @@ namespace Tests
             attributes.Add(ObjAttr.Strength, 10);
         }
     }
-    
+
     public class ObjectTest
     {
+        
     }
 }

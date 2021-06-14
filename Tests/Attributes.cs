@@ -5,7 +5,7 @@ namespace Tests
 {
     public class AttributeGroupTests
     {
-        enum types
+        public enum types
         {
             T0, T1, T2, T3
         }
