@@ -12,7 +12,7 @@ namespace Tests
         Max = 1UL << 63
     }
 
-    public class CharacteristicsTest
+    public class TraitsTest
     {
         [Flags]
         public enum TestFlag : ulong
@@ -26,14 +26,14 @@ namespace Tests
         [Test]
         public void CanCreate()
         {
-            var c = new Characteristics();
+            var c = new Traits();
             Assert.Pass();
         }
 
         [Test]
         public void CanAdd()
         {
-            var c = new Characteristics();
+            var c = new Traits();
             c.Add(TestFlag.Min | TestFlag.Max);
 
             Assert.True(c.Has(TestFlag.Min));
@@ -44,7 +44,7 @@ namespace Tests
             Assert.False(c.Has(Tests.TestFlag.Max));
             Assert.False(c.Has(Tests.TestFlag.Min | Tests.TestFlag.Max));
 
-            c = new Characteristics();
+            c = new Traits();
             c.Add(TestFlag.Min);
 
             Assert.True(c.Has(TestFlag.Min));
@@ -59,7 +59,7 @@ namespace Tests
         [Test]
         public void CanRemove()
         {
-            var c = new Characteristics();
+            var c = new Traits();
             c.Add(TestFlag.Min | TestFlag.Max);
 
             Assert.True(c.Has(TestFlag.Min));
@@ -80,14 +80,14 @@ namespace Tests
         [Test]
         public void HasWhenEmpty()
         {
-            var c = new Characteristics();
+            var c = new Traits();
             Assert.False(c.Has(Tests.TestFlag.Min));
         }
 
         [Test]
         public void HandlingUnions()
         {
-            var c = new Characteristics();
+            var c = new Traits();
             c.Add(TestFlag.Min | TestFlag.Mid | TestFlag.Max);
             c.Add(TestFlag.Min | TestFlag.Mid);
             c.Add(TestFlag.Mid | TestFlag.Max);
@@ -110,7 +110,7 @@ namespace Tests
         [Test]
         public void Values()
         {
-            var c = new Characteristics();
+            var c = new Traits();
 
             Assert.AreEqual(0, c.Value<TestFlag>());
             c.Add(TestFlag.Min);

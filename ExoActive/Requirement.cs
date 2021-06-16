@@ -9,25 +9,25 @@ namespace ExoActive
         public delegate bool Check(Object obj);
     }
 
-    public class CharacteristicRequirement : IRequirement
+    public class TraitRequirement : IRequirement
     {
-        private readonly Enum Characteristic;
+        private readonly Enum Trait;
         private readonly bool RequiredValue;
 
-        private CharacteristicRequirement(Enum characteristic, bool requiredValue = true)
+        private TraitRequirement(Enum trait, bool requiredValue = true)
         {
-            Characteristic = characteristic;
+            Trait = trait;
             RequiredValue = requiredValue;
         }
 
         public bool Passes(Object obj)
         {
-            return obj.Characteristics.Has(Characteristic) == RequiredValue;
+            return obj.Traits.Has(Trait) == RequiredValue;
         }
 
-        public static IRequirement.Check Create(Enum characteristic, bool requiredValue = true)
+        public static IRequirement.Check Create(Enum trait, bool requiredValue = true)
         {
-            var req = new CharacteristicRequirement(characteristic, requiredValue);
+            var req = new TraitRequirement(trait, requiredValue);
             return obj => req.Passes(obj);
         }
     }

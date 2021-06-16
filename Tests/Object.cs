@@ -19,7 +19,7 @@ namespace Tests
 
         public TestObj()
         {
-            characteristics.Add(ObjChar.Happy);
+            traits.Add(ObjChar.Happy);
             attributes.Add(ObjAttr.Strength, 10);
         }
     }

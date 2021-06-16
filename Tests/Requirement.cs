@@ -19,20 +19,20 @@ namespace Tests
         }
 
         [Test]
-        public void CharacteristicReqs()
+        public void TraitReqs()
         {
             var obj = new TestObj();
 
-            var happyCharReq = CharacteristicRequirement.Create(TestObj.ObjChar.Happy);
-            var notHappyCharReq = CharacteristicRequirement.Create(TestObj.ObjChar.Happy, false);
-            var sadCharReq = CharacteristicRequirement.Create(TestObj.ObjChar.Sad);
-            var notSadCharReq = CharacteristicRequirement.Create(TestObj.ObjChar.Sad, false);
+            var happyCharReq = TraitRequirement.Create(TestObj.ObjChar.Happy);
+            var notHappyCharReq = TraitRequirement.Create(TestObj.ObjChar.Happy, false);
+            var sadCharReq = TraitRequirement.Create(TestObj.ObjChar.Sad);
+            var notSadCharReq = TraitRequirement.Create(TestObj.ObjChar.Sad, false);
             Assert.True(happyCharReq(obj));
             Assert.False(notHappyCharReq(obj));
             Assert.False(sadCharReq(obj));
             Assert.True(notSadCharReq(obj));
 
-            obj.Characteristics.Add(TestObj.ObjChar.Sad);
+            obj.Traits.Add(TestObj.ObjChar.Sad);
             Assert.True(happyCharReq(obj));
             Assert.False(notHappyCharReq(obj));
             Assert.True(sadCharReq(obj));

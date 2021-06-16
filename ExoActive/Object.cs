@@ -10,7 +10,7 @@ namespace ExoActive
     {
         [DataMember] protected readonly Dictionary<string, State> states = new();
         [DataMember] protected readonly Attributes attributes = new();
-        [DataMember] protected readonly Characteristics characteristics = new();
+        [DataMember] protected readonly Traits traits = new();
 
         public bool IsPermittedTrigger<S>(Enum trigger) where S : State, new()
         {
@@ -35,7 +35,7 @@ namespace ExoActive
 
         public Attributes Attributes => attributes;
 
-        public Characteristics Characteristics => characteristics;
+        public Traits Traits => traits;
 
         private sealed class DefaultEqualityComparer : IEqualityComparer<Object>
         {
@@ -48,12 +48,12 @@ namespace ExoActive
                 return x.states.Keys.SequenceEqual(y.states.Keys)
                        && x.states.Values.SequenceEqual(y.states.Values, State.DefaultComparer)
                        && Attributes.DefaultComparer.Equals(x.attributes, y.attributes)
-                       && Characteristics.DefaultComparer.Equals(x.characteristics, y.characteristics);
+                       && Traits.DefaultComparer.Equals(x.traits, y.traits);
             }
 
             public int GetHashCode(Object obj)
             {
-                return HashCode.Combine(obj.states, obj.attributes, obj.characteristics);
+                return HashCode.Combine(obj.states, obj.attributes, obj.traits);
             }
         }
 

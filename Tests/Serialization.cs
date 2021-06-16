@@ -56,18 +56,18 @@ namespace Tests
 
 
         [Test]
-        public void CharacteristicsSerialization()
+        public void TraitsSerialization()
         {
-            var c = new Characteristics();
+            var c = new Traits();
             c.Add(TestFlag.Min);
 
             var jsonString = Serialize(c);
 
             Console.WriteLine(jsonString);
 
-            var dc = Deserialize<Characteristics>(jsonString);
+            var dc = Deserialize<Traits>(jsonString);
 
-            Assert.That(dc, Is.EqualTo(c).Using(Characteristics.DefaultComparer));
+            Assert.That(dc, Is.EqualTo(c).Using(Traits.DefaultComparer));
         }
 
         [Test]
