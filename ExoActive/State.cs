@@ -27,18 +27,17 @@ namespace ExoActive
 
         [DataMember]
         private StateReference stateRef;
-        
+
         public S CurrentState { 
             get => State;
         }
-        public abstract Array States { get; }
-        public abstract Array Triggers { get; }
         public delegate void Transitioned(Transition transInfo);
         public new event Transitioned OnTransitionCompleted;
 
         protected StateMachine(StateReference stateRef) : base(stateRef.get, stateRef.set)
         {
             this.stateRef = stateRef;
+            
             base.OnTransitionCompleted(t => OnTransitionCompleted?.Invoke(t));
         }
     }
@@ -46,7 +45,26 @@ namespace ExoActive
     [DataContract]
     public abstract class State : StateMachine<Enum, Enum>
     {
-        public string ID { get => GetType().FullName; }
+        private static readonly Dictionary<Enum, TriggerWithParameters<Object[]>> ActorTargetTriggers =
+            new Dictionary<Enum, TriggerWithParameters<Object[]>>();
+
+        protected static TriggerWithParameters<Object[]> GetActorTargetTrigger(Enum trigger)
+        {
+            return ActorTargetTriggers[trigger];
+        }
+        
+        protected static void AddActorTargetTrigggers<T>() where T : struct, Enum
+        {
+            foreach (var enumValue in Enum.GetValues<T>())
+            {
+                ActorTargetTriggers.Add(enumValue, new TriggerWithParameters<Object[]>(enumValue));
+            }
+        }
+        
+        public string Id
+        {
+            get => StateHelper.Id(this);
+        }
         
         [DataMember]
         public ulong LastTransitionTick { get; private set; }
@@ -83,4 +101,17 @@ namespace ExoActive
 
         public static IEqualityComparer<State> DefaultComparer { get; } = new DefaultEqualityComparer();
     }
+
+    public static class StateHelper<S> where S : State, new()
+    {
+        public static string Id { get => StateHelper.Id(typeof(S)); }
+        public static S CreateState() => new S();
+    }
+    
+    public static class StateHelper
+    {
+        internal static string Id (Type stateType) => stateType.AssemblyQualifiedName;
+        public static string Id(State state) => Id(state.GetType());
+    }
+
 }

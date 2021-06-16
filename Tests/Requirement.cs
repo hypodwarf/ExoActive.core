@@ -5,8 +5,8 @@ namespace Tests
 {
     public class RequirementTest
     {
-        static public readonly IRequirement.Check CanFill = StateRequirement.Create(Cup.Trigger.Fill);
-        static public readonly IRequirement.Check CanDrink = StateRequirement.Create(Cup.Trigger.Drink);
+        static public readonly IRequirement.Check CanFill = StateRequirement<Cup>.Create(Cup.Trigger.Fill);
+        static public readonly IRequirement.Check CanDrink = StateRequirement<Cup>.Create(Cup.Trigger.Drink);
         
         public bool GTE(int value, int threshold) => value >= threshold;
         public bool LT(int value, int threshold) => value < threshold;
@@ -55,19 +55,18 @@ namespace Tests
         [Test]
         public void StateReqs()
         {
-            var cupId = typeof(Cup).FullName;
             var obj = new TestObj();
             obj.AddState(new Cup());
 
             Assert.True(CanFill(obj));
             Assert.False(CanDrink(obj));
             
-            obj.State(cupId).Fire(Cup.Trigger.Fill);
+            obj.GetState<Cup>().Fire(Cup.Trigger.Fill);
             
             Assert.True(CanFill(obj));
             Assert.True(CanDrink(obj));
             
-            obj.State(cupId).Fire(Cup.Trigger.Fill);
+            obj.GetState<Cup>().Fire(Cup.Trigger.Fill);
             
             Assert.False(CanFill(obj));
             Assert.True(CanDrink(obj));

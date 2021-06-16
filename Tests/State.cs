@@ -19,9 +19,6 @@ namespace Tests
             Drink
         }
         
-        public override Array States { get => Enum.GetValues(typeof(State)); }
-        public override Array Triggers { get => Enum.GetValues(typeof(Trigger)); }
-
         public int Amount { get; private set; }
 
         public Cup() : this(State.Empty) { }
@@ -46,7 +43,7 @@ namespace Tests
     
     public class DynamicCup : State
     {
-        public new enum State
+        public enum State
         {
             Empty,
             HalfFull,
@@ -59,9 +56,6 @@ namespace Tests
             Drink,
             Evaporate
         }
-        
-        public override Array States { get => Enum.GetValues(typeof(State)); }
-        public override Array Triggers { get => Enum.GetValues(typeof(Trigger)); }
         
         public static readonly TriggerWithParameters<int> FillSome = new TriggerWithParameters<int>(Trigger.Fill);
         public static readonly TriggerWithParameters<int> DrinkSome = new TriggerWithParameters<int>(Trigger.Drink);

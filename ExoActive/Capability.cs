@@ -17,32 +17,62 @@ namespace ExoActive
         public void PerformAction(Object subject);
     }
     
-    public abstract class CapabilityAction<S> : ICapabilityAction where S : State, new()
+    public class CapabilityAction<S> : ICapabilityAction where S : State, new()
     {
-        protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
-
-        private static String StateId { get => typeof(S).FullName; }
-
-        protected virtual S CreateState()
+        public static Action<Object> FireAction(Enum trigger)
         {
-            return new S();
+            return obj => obj.GetState<S>().Fire(trigger);
         }
 
-        protected State GetState(Object obj) => obj.State(StateId);
+        public static CapabilityAction<S> CreateFireAction(Enum trigger)
+        {
+            return Create(
+                new[] {
+                    CapabilityAction<S>.FireAction(trigger)
+                },
+                new[] {
+                    StateRequirement<S>.Create(trigger)
+                });
+        }
+        
+        public static CapabilityAction<S> Create(Action<Object>[] actions, IRequirement.Check[] requirements)
+        {
+            var capabilityAction = new CapabilityAction<S>();
+            foreach (var action in actions)
+            {
+                capabilityAction.ActionEvent += action;
+            }
+
+            foreach (var requirement in requirements)
+            {
+                capabilityAction.Requirements.Add(requirement);
+            }
+
+            return capabilityAction;
+        }
+
+        protected event Action<Object> ActionEvent ;
+        protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
+
+        protected static State GetState(Object obj) => obj.GetState<S>();
+        protected virtual S CreateState() => StateHelper<S>.CreateState();
 
         public bool PassesRequirements(Object obj)
         {
-            if (!obj.HasState(StateId))
+            if (!obj.HasState<S>())
             {
                 obj.AddState(CreateState());
             }
             return Requirements.All(req => req(obj));
         }
 
-        public abstract void PerformAction(Object obj);
+        public virtual void PerformAction(Object obj)
+        {
+            ActionEvent?.Invoke(obj);
+        }
     }
     
-    public abstract class Capabilty: ICapability
+    public abstract class Capability: ICapability
     {
         protected readonly List<ICapabilityAction> actorActions = new List<ICapabilityAction>();
         protected readonly List<ICapabilityAction> targetActions = new List<ICapabilityAction>();

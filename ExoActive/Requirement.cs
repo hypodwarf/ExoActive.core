@@ -58,7 +58,7 @@ namespace ExoActive
         }
     }
 
-    public class StateRequirement : IRequirement
+    public class StateRequirement<S> : IRequirement where S: State, new()
     {
         private readonly Enum Trigger;
         private readonly bool Permitted;
@@ -71,12 +71,12 @@ namespace ExoActive
 
         public bool Passes(Object obj)
         {
-            return obj.IsPermittedTrigger(Trigger) == Permitted;
+            return obj.IsPermittedTrigger<S>(Trigger) == Permitted;
         }
         
         static public IRequirement.Check Create(Enum trigger, bool permitted = true)
         {
-            var req = new StateRequirement(trigger, permitted);
+            var req = new StateRequirement<S>(trigger, permitted);
             return obj => req.Passes(obj);
         }
     }

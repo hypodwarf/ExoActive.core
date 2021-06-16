@@ -15,24 +15,25 @@ namespace ExoActive
         [DataMember]
         protected readonly Characteristics characteristics = new Characteristics();
 
-        public bool IsPermittedTrigger(Enum trigger)
+        public bool IsPermittedTrigger<S>(Enum trigger) where S: State, new()
         {
-            return states.Values.Any(state => state.PermittedTriggers.Contains(trigger));
+            return GetState<S>().PermittedTriggers.Contains(trigger);
         }
 
         public void AddState(State state)
         {
-            states.Add(state.ID, state);
+            states.Add(state.Id, state);
         }
 
-        public State State(string stateId)
+        public State GetState<S>() where S: State, new()
         {
+            string stateId = StateHelper<S>.Id;
             return states[stateId];
         }
         
-        public bool HasState(string stateId)
+        public bool HasState<S>() where S: State, new()
         {
-            return states.ContainsKey(stateId);
+            return states.ContainsKey(StateHelper<S>.Id);
         }
 
         public Attributes Attributes
@@ -54,7 +55,7 @@ namespace ExoActive
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
                 return x.states.Keys.SequenceEqual(y.states.Keys)
-                       && x.states.Values.SequenceEqual(y.states.Values, ExoActive.State.DefaultComparer)
+                       && x.states.Values.SequenceEqual(y.states.Values, State.DefaultComparer)
                        && Attributes.DefaultComparer.Equals(x.attributes, y.attributes) 
                        && Characteristics.DefaultComparer.Equals(x.characteristics, y.characteristics);
             }

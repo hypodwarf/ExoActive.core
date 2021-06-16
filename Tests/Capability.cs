@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ExoActive;
 using NUnit.Framework;
+using Object = ExoActive.Object;
 
 namespace Tests
 {
@@ -9,11 +10,7 @@ namespace Tests
         public TestCapabilityActionFill()
         {
            Requirements.Add(RequirementTest.CanFill);
-        }
-
-        public override void PerformAction(Object obj)
-        {
-            GetState(obj).Fire(Cup.Trigger.Fill);
+           ActionEvent += obj => GetState(obj).Fire(Cup.Trigger.Fill);
         }
     }
     
@@ -30,7 +27,7 @@ namespace Tests
         }
     }
 
-    public class TestCapabilityDrink : Capabilty
+    public class TestCapabilityDrink : Capability
     {
         public TestCapabilityDrink()
         {
@@ -38,11 +35,22 @@ namespace Tests
         }
     }
     
-    public class TestCapabilityFill : Capabilty
+    public class TestCapabilityFill : Capability
     {
+        private static readonly CapabilityAction<Cup> Action = CapabilityAction<Cup>.Create(
+            new[]
+            {
+                CapabilityAction<Cup>.FireAction(Cup.Trigger.Fill)
+            },
+            new[]
+            {
+                RequirementTest.CanFill
+            }
+        );
+        
         public TestCapabilityFill()
         {
-            actorActions.Add(new TestCapabilityActionFill());
+            actorActions.Add(Action);
         }
     }
     
@@ -58,31 +66,30 @@ namespace Tests
         [Test]
         public void CanPerformAction()
         {
-            var cupId = typeof(Cup).FullName;
             var obj = new TestObj();
             var actors = new List<Object>{obj};
             var fill = new TestCapabilityFill();
             var drink = new TestCapabilityDrink();
             
-            Assert.False(obj.HasState(cupId));
+            Assert.False(obj.HasState<Cup>());
             
             Assert.False(drink.PerformAction(actors));
             Assert.True(fill.PerformAction(actors));
             
-            Assert.AreEqual(Cup.State.HalfFull, obj.State(cupId).CurrentState);
+            Assert.AreEqual(Cup.State.HalfFull, obj.GetState<Cup>().CurrentState);
             
             Assert.True(fill.PerformAction(actors));
             
-            Assert.AreEqual(Cup.State.Full, obj.State(cupId).CurrentState);
+            Assert.AreEqual(Cup.State.Full, obj.GetState<Cup>().CurrentState);
             
             Assert.False(fill.PerformAction(actors));
             Assert.True(drink.PerformAction(actors));
             
-            Assert.AreEqual(Cup.State.HalfFull, obj.State(cupId).CurrentState);
+            Assert.AreEqual(Cup.State.HalfFull, obj.GetState<Cup>().CurrentState);
             
             Assert.True(drink.PerformAction(actors));
             
-            Assert.AreEqual(Cup.State.Empty, obj.State(cupId).CurrentState);
+            Assert.AreEqual(Cup.State.Empty, obj.GetState<Cup>().CurrentState);
         }
         
         

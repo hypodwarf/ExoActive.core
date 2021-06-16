@@ -109,7 +109,7 @@ namespace Tests
             Assert.That(dObj, Is.EqualTo(obj).Using(Object.DefaultComparer));
         }
 
-        [Test, Ignore("This test shows how interfaces don't work correctly")]
+        [Test]
         public void DictState()
         {
             IDictionary<string, State> states = new Dictionary<string, State>();
