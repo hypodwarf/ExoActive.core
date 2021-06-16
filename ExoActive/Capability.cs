@@ -6,21 +6,21 @@ namespace ExoActive
 {
     public interface ICapability
     {
-        public bool PassesRequirements(List<Object> actors, List<Object> targets);
-        public bool PerformAction(List<Object> actors, List<Object> targets);
+        public bool PassesRequirements(List<Entity> actors, List<Entity> targets);
+        public bool PerformAction(List<Entity> actors, List<Entity> targets);
     }
 
     public interface ICapabilityAction
     {
-        public bool PassesRequirements(Object subject);
-        public void PerformAction(Object subject);
+        public bool PassesRequirements(Entity subject);
+        public void PerformAction(Entity subject);
     }
 
     public class CapabilityAction<S> : ICapabilityAction where S : State, new()
     {
-        public static Action<Object> FireAction(Enum trigger)
+        public static Action<Entity> FireAction(Enum trigger)
         {
-            return obj => obj.GetState<S>().Fire(trigger);
+            return entity => entity.GetState<S>().Fire(trigger);
         }
 
         public static CapabilityAction<S> CreateFireAction(Enum trigger)
@@ -36,7 +36,7 @@ namespace ExoActive
                 });
         }
 
-        public static CapabilityAction<S> Create(Action<Object>[] actions, IRequirement.Check[] requirements)
+        public static CapabilityAction<S> Create(Action<Entity>[] actions, IRequirement.Check[] requirements)
         {
             var capabilityAction = new CapabilityAction<S>();
             foreach (var action in actions) capabilityAction.ActionEvent += action;
@@ -46,12 +46,12 @@ namespace ExoActive
             return capabilityAction;
         }
 
-        protected event Action<Object> ActionEvent;
+        protected event Action<Entity> ActionEvent;
         protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
 
-        protected static State GetState(Object obj)
+        protected static State GetState(Entity entity)
         {
-            return obj.GetState<S>();
+            return entity.GetState<S>();
         }
 
         protected virtual S CreateState()
@@ -59,15 +59,15 @@ namespace ExoActive
             return StateHelper<S>.CreateState();
         }
 
-        public bool PassesRequirements(Object obj)
+        public bool PassesRequirements(Entity entity)
         {
-            if (!obj.HasState<S>()) obj.AddState(CreateState());
-            return Requirements.All(req => req(obj));
+            if (!entity.HasState<S>()) entity.AddState(CreateState());
+            return Requirements.All(req => req(entity));
         }
 
-        public virtual void PerformAction(Object obj)
+        public virtual void PerformAction(Entity entity)
         {
-            ActionEvent?.Invoke(obj);
+            ActionEvent?.Invoke(entity);
         }
     }
 
@@ -90,15 +90,15 @@ namespace ExoActive
             }
         }
 
-        public static bool PerformAction<C>(List<Object> actors, List<Object> targets = null)
+        public static bool PerformAction<C>(List<Entity> actors, List<Entity> targets = null)
             where C : Capability, new()
         {
             return Get<C>().PerformAction(actors, targets);
         }
 
-        public static bool PerformAction<C>(Object actor, params Object[] targets) where C : Capability, new()
+        public static bool PerformAction<C>(Entity actor, params Entity[] targets) where C : Capability, new()
         {
-            return PerformAction<C>(new List<Object> {actor}, targets.ToList());
+            return PerformAction<C>(new List<Entity> {actor}, targets.ToList());
         }
 
 
@@ -111,13 +111,13 @@ namespace ExoActive
             this.targetActions.AddRange(targetActions ?? Array.Empty<ICapabilityAction>());
         }
 
-        public bool PassesRequirements(List<Object> actors, List<Object> targets = null)
+        public bool PassesRequirements(List<Entity> actors, List<Entity> targets = null)
         {
             return actorActions.All(action => actors.All(action.PassesRequirements)) &&
-                   targetActions.All(action => (targets ?? new List<Object>()).All(action.PassesRequirements));
+                   targetActions.All(action => (targets ?? new List<Entity>()).All(action.PassesRequirements));
         }
 
-        public bool PerformAction(List<Object> actors, List<Object> targets = null)
+        public bool PerformAction(List<Entity> actors, List<Entity> targets = null)
         {
             if (PassesRequirements(actors, targets))
             {
@@ -129,9 +129,9 @@ namespace ExoActive
             return false;
         }
 
-        public bool PerformAction(Object actor, params Object[] targets)
+        public bool PerformAction(Entity actor, params Entity[] targets)
         {
-            return PerformAction(new List<Object> {actor}, targets.ToList());
+            return PerformAction(new List<Entity> {actor}, targets.ToList());
         }
     }
 }

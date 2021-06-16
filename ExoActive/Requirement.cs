@@ -4,9 +4,9 @@ namespace ExoActive
 {
     public interface IRequirement
     {
-        public bool Passes(Object obj);
+        public bool Passes(Entity entity);
 
-        public delegate bool Check(Object obj);
+        public delegate bool Check(Entity entity);
     }
 
     public class TraitRequirement : IRequirement
@@ -20,15 +20,15 @@ namespace ExoActive
             RequiredValue = requiredValue;
         }
 
-        public bool Passes(Object obj)
+        public bool Passes(Entity entity)
         {
-            return obj.Traits.Has(Trait) == RequiredValue;
+            return entity.Traits.Has(Trait) == RequiredValue;
         }
 
         public static IRequirement.Check Create(Enum trait, bool requiredValue = true)
         {
             var req = new TraitRequirement(trait, requiredValue);
-            return obj => req.Passes(obj);
+            return entity => req.Passes(entity);
         }
     }
 
@@ -47,15 +47,15 @@ namespace ExoActive
             Evaluation = evaluation;
         }
 
-        public bool Passes(Object obj)
+        public bool Passes(Entity entity)
         {
-            return Evaluation(obj.Attributes.GetAttributeValue(Attribute), Threshold);
+            return Evaluation(entity.Attributes.GetAttributeValue(Attribute), Threshold);
         }
 
         public static IRequirement.Check Create(Enum attribute, int threshold, Evaluate evaluation)
         {
             var req = new AttributeRequirement(attribute, threshold, evaluation);
-            return obj => req.Passes(obj);
+            return entity => req.Passes(entity);
         }
     }
 
@@ -70,15 +70,15 @@ namespace ExoActive
             Permitted = permitted;
         }
 
-        public bool Passes(Object obj)
+        public bool Passes(Entity entity)
         {
-            return obj.IsPermittedTrigger<S>(Trigger) == Permitted;
+            return entity.IsPermittedTrigger<S>(Trigger) == Permitted;
         }
 
         public static IRequirement.Check Create(Enum trigger, bool permitted = true)
         {
             var req = new StateRequirement<S>(trigger, permitted);
-            return obj => req.Passes(obj);
+            return entity => req.Passes(entity);
         }
     }
 }

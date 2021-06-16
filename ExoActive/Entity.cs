@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace ExoActive
 {
     [DataContract]
-    public abstract class Object
+    public abstract class Entity
     {
         [DataMember] protected readonly Dictionary<string, State> states = new();
         [DataMember] protected readonly Attributes attributes = new();
@@ -37,9 +37,9 @@ namespace ExoActive
 
         public Traits Traits => traits;
 
-        private sealed class DefaultEqualityComparer : IEqualityComparer<Object>
+        private sealed class DefaultEqualityComparer : IEqualityComparer<Entity>
         {
-            public bool Equals(Object x, Object y)
+            public bool Equals(Entity x, Entity y)
             {
                 if (ReferenceEquals(x, y)) return true;
                 if (ReferenceEquals(x, null)) return false;
@@ -51,12 +51,12 @@ namespace ExoActive
                        && Traits.DefaultComparer.Equals(x.traits, y.traits);
             }
 
-            public int GetHashCode(Object obj)
+            public int GetHashCode(Entity entity)
             {
-                return HashCode.Combine(obj.states, obj.attributes, obj.traits);
+                return HashCode.Combine(entity.states, entity.attributes, entity.traits);
             }
         }
 
-        public static IEqualityComparer<Object> DefaultComparer { get; } = new DefaultEqualityComparer();
+        public static IEqualityComparer<Entity> DefaultComparer { get; } = new DefaultEqualityComparer();
     }
 }

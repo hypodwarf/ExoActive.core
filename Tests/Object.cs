@@ -1,26 +1,26 @@
 using System;
-using Object = ExoActive.Object;
+using ExoActive;
 
 namespace Tests
 {
-    public class TestObj : Object
+    public class TestEntity : Entity
     {
         [Flags]
-        public enum ObjChar : ulong
+        public enum EntityTraits : ulong
         {
             Happy = 1UL << 0,
             Sad = 1UL << 1
         }
 
-        public enum ObjAttr
+        public enum EntityAttributes
         {
             Strength
         }
 
-        public TestObj()
+        public TestEntity()
         {
-            traits.Add(ObjChar.Happy);
-            attributes.Add(ObjAttr.Strength, 10);
+            traits.Add(EntityTraits.Happy);
+            attributes.Add(EntityAttributes.Strength, 10);
         }
     }
 

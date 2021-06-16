@@ -2,7 +2,7 @@ using ExoActive;
 
 namespace Example
 {
-    public class Item : Object
+    public class Item : Entity
     {
     }
 }

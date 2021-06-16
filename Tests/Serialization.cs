@@ -4,7 +4,6 @@ using ExoActive;
 using JsonNetConverters;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Object = ExoActive.Object;
 
 namespace Tests
 {
@@ -58,16 +57,16 @@ namespace Tests
         [Test]
         public void TraitsSerialization()
         {
-            var c = new Traits();
-            c.Add(TestFlag.Min);
+            var traits = new Traits();
+            traits.Add(TestFlag.Min);
 
-            var jsonString = Serialize(c);
+            var jsonString = Serialize(traits);
 
             Console.WriteLine(jsonString);
 
-            var dc = Deserialize<Traits>(jsonString);
+            var dTraits = Deserialize<Traits>(jsonString);
 
-            Assert.That(dc, Is.EqualTo(c).Using(Traits.DefaultComparer));
+            Assert.That(dTraits, Is.EqualTo(traits).Using(Traits.DefaultComparer));
         }
 
         [Test]
@@ -85,39 +84,28 @@ namespace Tests
         }
 
         [Test]
-        public void ObjectSerialization()
+        public void EntitySerialization()
         {
-            var obj = new TestObj();
-            var jsonString = Serialize(obj);
+            var entity = new TestEntity();
+            var jsonString = Serialize(entity);
 
             // Console.WriteLine(jsonString);
 
-            // var dObj = Deserialize<TestObj>(jsonString);
+            // var dEntity = Deserialize<TestEntity>(jsonString);
 
-            // Assert.That(dObj, Is.EqualTo(obj).Using(Object.DefaultComparer));
+            // Assert.That(dEntity, Is.EqualTo(entity).Using(Entity.DefaultComparer));
 
             var fill = Capability.Get<TestCapabilityFill>();
             var drink = Capability.Get<TestCapabilityDrink>();
 
-            fill.PerformAction(new List<Object>() {obj});
-            jsonString = Serialize(obj);
+            fill.PerformAction(new List<Entity>() {entity});
+            jsonString = Serialize(entity);
 
             Console.WriteLine(jsonString);
 
-            var dObj = Deserialize<TestObj>(jsonString);
+            var dEntity = Deserialize<TestEntity>(jsonString);
 
-            Assert.That(dObj, Is.EqualTo(obj).Using(Object.DefaultComparer));
-        }
-
-        [Test]
-        public void DictState()
-        {
-            IDictionary<string, State> states = new Dictionary<string, State>();
-            var jsonString = Serialize(states);
-
-            Console.WriteLine(jsonString);
-
-            var dObj = Deserialize<IDictionary<string, State>>(jsonString);
+            Assert.That(dEntity, Is.EqualTo(entity).Using(Entity.DefaultComparer));
         }
     }
 }

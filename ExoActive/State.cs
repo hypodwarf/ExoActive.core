@@ -48,10 +48,10 @@ namespace ExoActive
     [DataContract]
     public abstract class State : StateMachine<Enum, Enum>
     {
-        private static readonly Dictionary<Enum, TriggerWithParameters<Object[]>> ActorTargetTriggers =
+        private static readonly Dictionary<Enum, TriggerWithParameters<Entity[]>> ActorTargetTriggers =
             new();
 
-        protected static TriggerWithParameters<Object[]> GetActorTargetTrigger(Enum trigger)
+        protected static TriggerWithParameters<Entity[]> GetActorTargetTrigger(Enum trigger)
         {
             return ActorTargetTriggers[trigger];
         }
@@ -59,7 +59,7 @@ namespace ExoActive
         protected static void AddActorTargetTrigggers<T>() where T : struct, Enum
         {
             foreach (var enumValue in Enum.GetValues<T>())
-                ActorTargetTriggers.Add(enumValue, new TriggerWithParameters<Object[]>(enumValue));
+                ActorTargetTriggers.Add(enumValue, new TriggerWithParameters<Entity[]>(enumValue));
         }
 
         public string Id => StateHelper.Id(this);

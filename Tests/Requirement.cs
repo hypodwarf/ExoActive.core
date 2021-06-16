@@ -21,62 +21,62 @@ namespace Tests
         [Test]
         public void TraitReqs()
         {
-            var obj = new TestObj();
+            var entity = new TestEntity();
 
-            var happyCharReq = TraitRequirement.Create(TestObj.ObjChar.Happy);
-            var notHappyCharReq = TraitRequirement.Create(TestObj.ObjChar.Happy, false);
-            var sadCharReq = TraitRequirement.Create(TestObj.ObjChar.Sad);
-            var notSadCharReq = TraitRequirement.Create(TestObj.ObjChar.Sad, false);
-            Assert.True(happyCharReq(obj));
-            Assert.False(notHappyCharReq(obj));
-            Assert.False(sadCharReq(obj));
-            Assert.True(notSadCharReq(obj));
+            var happyCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Happy);
+            var notHappyCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Happy, false);
+            var sadCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Sad);
+            var notSadCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Sad, false);
+            Assert.True(happyCharReq(entity));
+            Assert.False(notHappyCharReq(entity));
+            Assert.False(sadCharReq(entity));
+            Assert.True(notSadCharReq(entity));
 
-            obj.Traits.Add(TestObj.ObjChar.Sad);
-            Assert.True(happyCharReq(obj));
-            Assert.False(notHappyCharReq(obj));
-            Assert.True(sadCharReq(obj));
-            Assert.False(notSadCharReq(obj));
+            entity.Traits.Add(TestEntity.EntityTraits.Sad);
+            Assert.True(happyCharReq(entity));
+            Assert.False(notHappyCharReq(entity));
+            Assert.True(sadCharReq(entity));
+            Assert.False(notSadCharReq(entity));
         }
 
         [Test]
         public void AttributesReqs()
         {
-            var obj = new TestObj();
+            var entity = new TestEntity();
 
-            var lowStrength = AttributeRequirement.Create(TestObj.ObjAttr.Strength, 10, LT);
-            var goodStrength = AttributeRequirement.Create(TestObj.ObjAttr.Strength, 10, GTE);
+            var lowStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, 10, LT);
+            var goodStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, 10, GTE);
 
-            Assert.False(lowStrength(obj));
-            Assert.True(goodStrength(obj));
+            Assert.False(lowStrength(entity));
+            Assert.True(goodStrength(entity));
 
             var attrMods = new Attributes();
-            attrMods.Add(TestObj.ObjAttr.Strength, -5);
+            attrMods.Add(TestEntity.EntityAttributes.Strength, -5);
 
-            obj.Attributes.Apply(attrMods);
+            entity.Attributes.Apply(attrMods);
 
-            Assert.False(goodStrength(obj));
-            Assert.True(lowStrength(obj));
+            Assert.False(goodStrength(entity));
+            Assert.True(lowStrength(entity));
         }
 
         [Test]
         public void StateReqs()
         {
-            var obj = new TestObj();
-            obj.AddState(new Cup());
+            var entity = new TestEntity();
+            entity.AddState(new Cup());
 
-            Assert.True(CanFill(obj));
-            Assert.False(CanDrink(obj));
+            Assert.True(CanFill(entity));
+            Assert.False(CanDrink(entity));
 
-            obj.GetState<Cup>().Fire(Cup.Trigger.Fill);
+            entity.GetState<Cup>().Fire(Cup.Trigger.Fill);
 
-            Assert.True(CanFill(obj));
-            Assert.True(CanDrink(obj));
+            Assert.True(CanFill(entity));
+            Assert.True(CanDrink(entity));
 
-            obj.GetState<Cup>().Fire(Cup.Trigger.Fill);
+            entity.GetState<Cup>().Fire(Cup.Trigger.Fill);
 
-            Assert.False(CanFill(obj));
-            Assert.True(CanDrink(obj));
+            Assert.False(CanFill(entity));
+            Assert.True(CanDrink(entity));
         }
     }
 }
