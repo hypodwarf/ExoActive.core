@@ -15,7 +15,7 @@ namespace ExoActive
             public S get() => State;
             public void set(S state)
             {
-                Console.WriteLine(state);
+                // Console.WriteLine(state);
                 State = state;
             }
 

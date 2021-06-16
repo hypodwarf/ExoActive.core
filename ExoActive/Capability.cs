@@ -84,10 +84,20 @@ namespace ExoActive
             }
             catch (KeyNotFoundException)
             {
-                return new C();
+                var c = new C();
+                capabilities.Add(typeof(C), c);
+
+                return c;
             }
         }
         
+        public static bool PerformAction<C>(List<Object> actors, List<Object> targets = null) where C : Capability, new () => 
+            Get<C>().PerformAction(actors, targets);
+
+        public static bool PerformAction<C>(Object actor, params Object[] targets) where C : Capability, new() =>
+            PerformAction<C>(new List<Object> {actor}, targets.ToList());
+        
+
         private readonly List<ICapabilityAction> actorActions = new List<ICapabilityAction>();
         private readonly List<ICapabilityAction> targetActions = new List<ICapabilityAction>();
 
@@ -95,7 +105,6 @@ namespace ExoActive
         {
             this.actorActions.AddRange(actorActions);
             this.targetActions.AddRange(targetActions ?? Array.Empty<ICapabilityAction>());
-            capabilities.Add(this.GetType(), this);
         }
 
         public bool PassesRequirements(List<Object> actors, List<Object> targets = null)
@@ -118,5 +127,8 @@ namespace ExoActive
 
             return false;
         }
+
+        public bool PerformAction(Object actor, params Object[] targets) =>  
+            PerformAction(new List<Object> {actor}, targets.ToList());
     }
 }

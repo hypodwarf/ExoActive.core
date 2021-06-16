@@ -8,7 +8,10 @@ namespace Example
     {
         static void Main(string[] args)
         {
-            
+            var actor = new Actor();
+            Capability.PerformAction<PutDown>(actor);
+            Capability.PerformAction<PutDown>(actor);
+            Console.WriteLine(actor.GetState<HoldState>().CurrentState);
         }
         
         

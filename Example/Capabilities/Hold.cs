@@ -37,7 +37,7 @@ namespace Example.Capabilities
         private static readonly CapabilityAction<HoldState> ActorPickUpAction =
             CapabilityAction<HoldState>.CreateFireAction(HoldState.Trigger.PickUp);
         
-        private PickUp() : base(new ICapabilityAction[] {ActorPickUpAction})
+        public PickUp() : base(new ICapabilityAction[] {ActorPickUpAction})
         {
         }
     }
