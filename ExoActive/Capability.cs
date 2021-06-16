@@ -4,19 +4,18 @@ using System.Linq;
 
 namespace ExoActive
 {
-    
     public interface ICapability
     {
         public bool PassesRequirements(List<Object> actors, List<Object> targets);
         public bool PerformAction(List<Object> actors, List<Object> targets);
     }
-    
+
     public interface ICapabilityAction
     {
         public bool PassesRequirements(Object subject);
         public void PerformAction(Object subject);
     }
-    
+
     public class CapabilityAction<S> : ICapabilityAction where S : State, new()
     {
         public static Action<Object> FireAction(Enum trigger)
@@ -27,42 +26,42 @@ namespace ExoActive
         public static CapabilityAction<S> CreateFireAction(Enum trigger)
         {
             return Create(
-                new[] {
-                    CapabilityAction<S>.FireAction(trigger)
+                new[]
+                {
+                    FireAction(trigger)
                 },
-                new[] {
+                new[]
+                {
                     StateRequirement<S>.Create(trigger)
                 });
         }
-        
+
         public static CapabilityAction<S> Create(Action<Object>[] actions, IRequirement.Check[] requirements)
         {
             var capabilityAction = new CapabilityAction<S>();
-            foreach (var action in actions)
-            {
-                capabilityAction.ActionEvent += action;
-            }
+            foreach (var action in actions) capabilityAction.ActionEvent += action;
 
-            foreach (var requirement in requirements)
-            {
-                capabilityAction.Requirements.Add(requirement);
-            }
+            foreach (var requirement in requirements) capabilityAction.Requirements.Add(requirement);
 
             return capabilityAction;
         }
 
-        protected event Action<Object> ActionEvent ;
+        protected event Action<Object> ActionEvent;
         protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
 
-        protected static State GetState(Object obj) => obj.GetState<S>();
-        protected virtual S CreateState() => StateHelper<S>.CreateState();
+        protected static State GetState(Object obj)
+        {
+            return obj.GetState<S>();
+        }
+
+        protected virtual S CreateState()
+        {
+            return StateHelper<S>.CreateState();
+        }
 
         public bool PassesRequirements(Object obj)
         {
-            if (!obj.HasState<S>())
-            {
-                obj.AddState(CreateState());
-            }
+            if (!obj.HasState<S>()) obj.AddState(CreateState());
             return Requirements.All(req => req(obj));
         }
 
@@ -71,10 +70,10 @@ namespace ExoActive
             ActionEvent?.Invoke(obj);
         }
     }
-    
-    public abstract class Capability: ICapability
+
+    public abstract class Capability : ICapability
     {
-        private static readonly Dictionary<Type, Capability> capabilities = new Dictionary<Type, Capability>();
+        private static readonly Dictionary<Type, Capability> capabilities = new();
 
         public static Capability Get<C>() where C : Capability, new()
         {
@@ -90,16 +89,21 @@ namespace ExoActive
                 return c;
             }
         }
-        
-        public static bool PerformAction<C>(List<Object> actors, List<Object> targets = null) where C : Capability, new () => 
-            Get<C>().PerformAction(actors, targets);
 
-        public static bool PerformAction<C>(Object actor, params Object[] targets) where C : Capability, new() =>
-            PerformAction<C>(new List<Object> {actor}, targets.ToList());
-        
+        public static bool PerformAction<C>(List<Object> actors, List<Object> targets = null)
+            where C : Capability, new()
+        {
+            return Get<C>().PerformAction(actors, targets);
+        }
 
-        private readonly List<ICapabilityAction> actorActions = new List<ICapabilityAction>();
-        private readonly List<ICapabilityAction> targetActions = new List<ICapabilityAction>();
+        public static bool PerformAction<C>(Object actor, params Object[] targets) where C : Capability, new()
+        {
+            return PerformAction<C>(new List<Object> {actor}, targets.ToList());
+        }
+
+
+        private readonly List<ICapabilityAction> actorActions = new();
+        private readonly List<ICapabilityAction> targetActions = new();
 
         protected Capability(ICapabilityAction[] actorActions, ICapabilityAction[] targetActions = null)
         {
@@ -118,17 +122,16 @@ namespace ExoActive
             if (PassesRequirements(actors, targets))
             {
                 actorActions.ForEach(action => actors.ForEach(action.PerformAction));
-                if (targets != null)
-                {
-                    targetActions.ForEach(action => targets.ForEach(action.PerformAction));
-                }
+                if (targets != null) targetActions.ForEach(action => targets.ForEach(action.PerformAction));
                 return true;
             }
 
             return false;
         }
 
-        public bool PerformAction(Object actor, params Object[] targets) =>  
-            PerformAction(new List<Object> {actor}, targets.ToList());
+        public bool PerformAction(Object actor, params Object[] targets)
+        {
+            return PerformAction(new List<Object> {actor}, targets.ToList());
+        }
     }
 }

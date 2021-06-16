@@ -9,11 +9,11 @@ namespace Example.Capabilities
         {
             AddActorTargetTrigggers<Trigger>();
         }
-        
+
         private new enum State
         {
             Empty,
-            Full,
+            Full
         }
 
         internal enum Trigger
@@ -21,7 +21,7 @@ namespace Example.Capabilities
             PickUp,
             PutDown
         }
-        
+
         public HoldState() : base(State.Empty)
         {
             Configure(State.Empty)
@@ -36,17 +36,17 @@ namespace Example.Capabilities
     {
         private static readonly CapabilityAction<HoldState> ActorPickUpAction =
             CapabilityAction<HoldState>.CreateFireAction(HoldState.Trigger.PickUp);
-        
+
         public PickUp() : base(new ICapabilityAction[] {ActorPickUpAction})
         {
         }
     }
-    
+
     public class PutDown : Capability
     {
         private static readonly CapabilityAction<HoldState> ActorPutDownAction =
             CapabilityAction<HoldState>.CreateFireAction(HoldState.Trigger.PutDown);
-        
+
         public PutDown() : base(new ICapabilityAction[] {ActorPutDownAction})
         {
         }

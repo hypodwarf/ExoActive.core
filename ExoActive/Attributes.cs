@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,19 +12,24 @@ namespace ExoActive
     [DataContract]
     public class AttributeGroup<S, T>
     {
-        [DataMember]
-        private Dictionary<S, Attribute<T>> attributes = new Dictionary<S, Attribute<T>>();
+        [DataMember] private Dictionary<S, Attribute<T>> attributes = new();
 
         private delegate Attribute<T> AttributeAction(Attribute<T> a, Attribute<T> b);
 
-        public void Add(S type, T value = default, string name = null) => 
+        public void Add(S type, T value = default, string name = null)
+        {
             attributes.Add(type, new Attribute<T>(name ?? type.ToString(), value));
+        }
 
-        public void Remove(S type) => 
+        public void Remove(S type)
+        {
             attributes.Remove(type);
+        }
 
-        public bool Has(S type) => 
-            attributes.ContainsKey(type);
+        public bool Has(S type)
+        {
+            return attributes.ContainsKey(type);
+        }
 
         public T GetAttributeValue(S type)
         {
@@ -34,18 +38,12 @@ namespace ExoActive
 
         private List<S> PerformActionOnGroup(AttributeGroup<S, T> attributeGroup, AttributeAction action)
         {
-            List<S> failed = new List<S>();
-            foreach ((var type, var attribute) in attributeGroup.attributes)
-            {
+            var failed = new List<S>();
+            foreach (var (type, attribute) in attributeGroup.attributes)
                 if (attributes.ContainsKey(type))
-                {
                     attributes[type] = action(attributes[type], attribute);
-                }
                 else
-                {
                     failed.Add(type);
-                }
-            }
 
             return failed;
         }
@@ -73,7 +71,7 @@ namespace ExoActive
 
             public int GetHashCode(AttributeGroup<S, T> obj)
             {
-                return (obj.attributes != null ? obj.attributes.GetHashCode() : 0);
+                return obj.attributes != null ? obj.attributes.GetHashCode() : 0;
             }
         }
 

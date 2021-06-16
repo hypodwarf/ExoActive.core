@@ -8,14 +8,11 @@ namespace ExoActive
     [DataContract]
     public abstract class Object
     {
-        [DataMember]
-        protected readonly Dictionary<string, State> states = new Dictionary<string, State>();
-        [DataMember]
-        protected readonly Attributes attributes = new Attributes();
-        [DataMember]
-        protected readonly Characteristics characteristics = new Characteristics();
+        [DataMember] protected readonly Dictionary<string, State> states = new();
+        [DataMember] protected readonly Attributes attributes = new();
+        [DataMember] protected readonly Characteristics characteristics = new();
 
-        public bool IsPermittedTrigger<S>(Enum trigger) where S: State, new()
+        public bool IsPermittedTrigger<S>(Enum trigger) where S : State, new()
         {
             return GetState<S>().PermittedTriggers.Contains(trigger);
         }
@@ -25,26 +22,20 @@ namespace ExoActive
             states.Add(state.Id, state);
         }
 
-        public State GetState<S>() where S: State, new()
+        public State GetState<S>() where S : State, new()
         {
-            string stateId = StateHelper<S>.Id;
+            var stateId = StateHelper<S>.Id;
             return states[stateId];
         }
-        
-        public bool HasState<S>() where S: State, new()
+
+        public bool HasState<S>() where S : State, new()
         {
             return states.ContainsKey(StateHelper<S>.Id);
         }
 
-        public Attributes Attributes
-        {
-            get => attributes;
-        }
+        public Attributes Attributes => attributes;
 
-        public Characteristics Characteristics
-        {
-            get => characteristics;
-        }
+        public Characteristics Characteristics => characteristics;
 
         private sealed class DefaultEqualityComparer : IEqualityComparer<Object>
         {
@@ -56,7 +47,7 @@ namespace ExoActive
                 if (x.GetType() != y.GetType()) return false;
                 return x.states.Keys.SequenceEqual(y.states.Keys)
                        && x.states.Values.SequenceEqual(y.states.Values, State.DefaultComparer)
-                       && Attributes.DefaultComparer.Equals(x.attributes, y.attributes) 
+                       && Attributes.DefaultComparer.Equals(x.attributes, y.attributes)
                        && Characteristics.DefaultComparer.Equals(x.characteristics, y.characteristics);
             }
 

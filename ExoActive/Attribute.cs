@@ -17,16 +17,11 @@ namespace ExoActive
     [DataContract]
     public readonly struct Attribute<T> : IEquatable<Attribute<T>>
     {
-        [DataMember]
-        public readonly NamedValue<T> namedValue;
-        [DataMember]
-        private readonly Attribute<T>[] modifiers;
-        [DataMember]
-        public readonly NamedValue<T> modifiedValue;
-        [DataMember]
-        public readonly Guid guid;
-        [DataMember]
-        public readonly ulong version;
+        [DataMember] public readonly NamedValue<T> namedValue;
+        [DataMember] private readonly Attribute<T>[] modifiers;
+        [DataMember] public readonly NamedValue<T> modifiedValue;
+        [DataMember] public readonly Guid guid;
+        [DataMember] public readonly ulong version;
 
         public Attribute(string name, T baseValue) : this(new NamedValue<T>(name, baseValue))
         {
@@ -120,10 +115,10 @@ namespace ExoActive
 
         public bool Equals(Attribute<T> other)
         {
-            return namedValue.Equals(other.namedValue) 
-                   && modifiers.SequenceEqual(other.modifiers) 
+            return namedValue.Equals(other.namedValue)
+                   && modifiers.SequenceEqual(other.modifiers)
                    && modifiedValue.Equals(other.modifiedValue)
-                   && guid.Equals(other.guid) 
+                   && guid.Equals(other.guid)
                    && version == other.version;
         }
 

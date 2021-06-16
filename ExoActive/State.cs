@@ -10,9 +10,13 @@ namespace ExoActive
         [DataContract]
         protected class StateReference
         {
-            [DataMember]
-            private S State;
-            public S get() => State;
+            [DataMember] private S State;
+
+            public S get()
+            {
+                return State;
+            }
+
             public void set(S state)
             {
                 // Console.WriteLine(state);
@@ -25,51 +29,46 @@ namespace ExoActive
             }
         }
 
-        [DataMember]
-        private StateReference stateRef;
+        [DataMember] private StateReference stateRef;
 
-        public S CurrentState { 
-            get => State;
-        }
+        public S CurrentState => State;
+
         public delegate void Transitioned(Transition transInfo);
+
         public new event Transitioned OnTransitionCompleted;
 
         protected StateMachine(StateReference stateRef) : base(stateRef.get, stateRef.set)
         {
             this.stateRef = stateRef;
-            
+
             base.OnTransitionCompleted(t => OnTransitionCompleted?.Invoke(t));
         }
     }
-    
+
     [DataContract]
     public abstract class State : StateMachine<Enum, Enum>
     {
         private static readonly Dictionary<Enum, TriggerWithParameters<Object[]>> ActorTargetTriggers =
-            new Dictionary<Enum, TriggerWithParameters<Object[]>>();
+            new();
 
         protected static TriggerWithParameters<Object[]> GetActorTargetTrigger(Enum trigger)
         {
             return ActorTargetTriggers[trigger];
         }
-        
+
         protected static void AddActorTargetTrigggers<T>() where T : struct, Enum
         {
             foreach (var enumValue in Enum.GetValues<T>())
-            {
                 ActorTargetTriggers.Add(enumValue, new TriggerWithParameters<Object[]>(enumValue));
-            }
         }
-        
-        public string Id
-        {
-            get => StateHelper.Id(this);
-        }
-        
-        [DataMember]
-        public ulong LastTransitionTick { get; private set; }
 
-        protected virtual void OnTickEvent() {}
+        public string Id => StateHelper.Id(this);
+
+        [DataMember] public ulong LastTransitionTick { get; private set; }
+
+        protected virtual void OnTickEvent()
+        {
+        }
 
         private void TransitionHandler(Transition transInfo)
         {
@@ -104,14 +103,24 @@ namespace ExoActive
 
     public static class StateHelper<S> where S : State, new()
     {
-        public static string Id { get => StateHelper.Id(typeof(S)); }
-        public static S CreateState() => new S();
-    }
-    
-    public static class StateHelper
-    {
-        internal static string Id (Type stateType) => stateType.AssemblyQualifiedName;
-        public static string Id(State state) => Id(state.GetType());
+        public static string Id => StateHelper.Id(typeof(S));
+
+        public static S CreateState()
+        {
+            return new();
+        }
     }
 
+    public static class StateHelper
+    {
+        internal static string Id(Type stateType)
+        {
+            return stateType.AssemblyQualifiedName;
+        }
+
+        public static string Id(State state)
+        {
+            return Id(state.GetType());
+        }
+    }
 }

@@ -4,16 +4,14 @@ using ExoActive;
 
 namespace Example
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var actor = new Actor();
             Capability.PerformAction<PutDown>(actor);
             Capability.PerformAction<PutDown>(actor);
             Console.WriteLine(actor.GetState<HoldState>().CurrentState);
         }
-        
-        
     }
 }
