@@ -74,8 +74,29 @@ namespace ExoActive
     
     public abstract class Capability: ICapability
     {
-        protected readonly List<ICapabilityAction> actorActions = new List<ICapabilityAction>();
-        protected readonly List<ICapabilityAction> targetActions = new List<ICapabilityAction>();
+        private static readonly Dictionary<Type, Capability> capabilities = new Dictionary<Type, Capability>();
+
+        public static Capability Get<C>() where C : Capability, new()
+        {
+            try
+            {
+                return capabilities[typeof(C)];
+            }
+            catch (KeyNotFoundException)
+            {
+                return new C();
+            }
+        }
+        
+        private readonly List<ICapabilityAction> actorActions = new List<ICapabilityAction>();
+        private readonly List<ICapabilityAction> targetActions = new List<ICapabilityAction>();
+
+        protected Capability(ICapabilityAction[] actorActions, ICapabilityAction[] targetActions = null)
+        {
+            this.actorActions.AddRange(actorActions);
+            this.targetActions.AddRange(targetActions ?? Array.Empty<ICapabilityAction>());
+            capabilities.Add(this.GetType(), this);
+        }
 
         public bool PassesRequirements(List<Object> actors, List<Object> targets = null)
         {

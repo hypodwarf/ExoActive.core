@@ -96,8 +96,8 @@ namespace Tests
             
             // Assert.That(dObj, Is.EqualTo(obj).Using(Object.DefaultComparer));
 
-            var fill = new TestCapabilityFill();
-            var drink = new TestCapabilityDrink();
+            var fill = Capability.Get<TestCapabilityFill>();
+            var drink = Capability.Get<TestCapabilityDrink>();
 
             fill.PerformAction(new List<Object>(){obj});
             jsonString = Serialize(obj);

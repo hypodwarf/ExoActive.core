@@ -29,9 +29,11 @@ namespace Tests
 
     public class TestCapabilityDrink : Capability
     {
-        public TestCapabilityDrink()
+        public TestCapabilityDrink() : base(new ICapabilityAction[]
         {
-            actorActions.Add(new TestCapabilityActionDrink());
+            new TestCapabilityActionDrink()
+        })
+        {
         }
     }
     
@@ -47,10 +49,9 @@ namespace Tests
                 RequirementTest.CanFill
             }
         );
-        
-        public TestCapabilityFill()
+
+        public TestCapabilityFill(): base(new ICapabilityAction[]{Action})
         {
-            actorActions.Add(Action);
         }
     }
     
@@ -59,8 +60,8 @@ namespace Tests
         [Test]
         public void CanCreate()
         {
-            var _ = new TestCapabilityFill();
-            Assert.Pass();
+            var cap = Capability.Get<TestCapabilityFill>();
+            Assert.IsInstanceOf<TestCapabilityFill>(cap);
         }
 
         [Test]
@@ -68,8 +69,8 @@ namespace Tests
         {
             var obj = new TestObj();
             var actors = new List<Object>{obj};
-            var fill = new TestCapabilityFill();
-            var drink = new TestCapabilityDrink();
+            var fill = Capability.Get<TestCapabilityFill>();
+            var drink = Capability.Get<TestCapabilityDrink>();
             
             Assert.False(obj.HasState<Cup>());
             

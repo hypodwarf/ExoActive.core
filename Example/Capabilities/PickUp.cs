@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using ExoActive;
 
 namespace Example.Capabilities
@@ -36,9 +37,8 @@ namespace Example.Capabilities
         private static readonly CapabilityAction<HoldState> ActorPickUpAction =
             CapabilityAction<HoldState>.CreateFireAction(HoldState.Trigger.PickUp);
         
-        public PickUp()
+        private PickUp() : base(new ICapabilityAction[] {ActorPickUpAction})
         {
-            actorActions.Add(ActorPickUpAction);
         }
     }
     
@@ -47,9 +47,8 @@ namespace Example.Capabilities
         private static readonly CapabilityAction<HoldState> ActorPutDownAction =
             CapabilityAction<HoldState>.CreateFireAction(HoldState.Trigger.PutDown);
         
-        public PutDown()
+        public PutDown() : base(new ICapabilityAction[] {ActorPutDownAction})
         {
-            actorActions.Add(ActorPutDownAction);
         }
     }
 }
