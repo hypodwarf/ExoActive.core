@@ -24,7 +24,7 @@ namespace Tests
         }
     }
 
-    public class ObjectTest
+    public class EntityTest
     {
     }
 }

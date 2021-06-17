@@ -4,44 +4,21 @@ using NUnit.Framework;
 
 namespace Tests
 {
-    public class TestCapabilityActionFill : CapabilityAction<Cup>
-    {
-        public TestCapabilityActionFill()
-        {
-            Requirements.Add(RequirementTest.CanFill);
-            ActionEvent += entity => GetState(entity).Fire(Cup.Trigger.Fill);
-        }
-    }
-
-    public class TestCapabilityActionDrink : CapabilityAction<Cup>
-    {
-        public TestCapabilityActionDrink()
-        {
-            Requirements.Add(RequirementTest.CanDrink);
-        }
-
-        public override void PerformAction(Entity entity)
-        {
-            GetState(entity).Fire(Cup.Trigger.Drink);
-        }
-    }
-
+    // Creating the Capability using the CapabilityTriggerProcess
     public class TestCapabilityDrink : Capability
     {
-        public TestCapabilityDrink() : base(new ICapabilityAction[]
-        {
-            new TestCapabilityActionDrink()
-        })
-        {
-        }
+        public TestCapabilityDrink() : base(
+            new ICapabilityProcess[] { CapabilityTriggerProcess<Cup>.Get(Cup.Trigger.Drink) })
+        { }
     }
 
+    // Creating the Capability using the CapabilityStateProcess
     public class TestCapabilityFill : Capability
     {
-        private static readonly CapabilityAction<Cup> Action = CapabilityAction<Cup>.Create(
+        private static readonly CapabilityStateProcess<Cup> TriggerProcess = CapabilityStateProcess<Cup>.Create(
             new[]
             {
-                CapabilityAction<Cup>.FireAction(Cup.Trigger.Fill)
+                CapabilityStateProcess<Cup>.FireAction(Cup.Trigger.Fill)
             },
             new[]
             {
@@ -49,7 +26,7 @@ namespace Tests
             }
         );
 
-        public TestCapabilityFill() : base(new ICapabilityAction[] {Action})
+        public TestCapabilityFill() : base(new ICapabilityProcess[] {TriggerProcess})
         {
         }
     }

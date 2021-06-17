@@ -6,6 +6,9 @@ namespace Example
     {
         public Actor()
         {
+            attributes.Add(PhysicalAttributes.Strength, 10);
+            attributes.Add(PhysicalAttributes.Weight, 3);
+            traits.Add(PhysicalTraits.CanCarry);
         }
     }
 }

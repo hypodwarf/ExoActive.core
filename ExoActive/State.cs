@@ -48,19 +48,23 @@ namespace ExoActive
     [DataContract]
     public abstract class State : StateMachine<Enum, Enum>
     {
-        private static readonly Dictionary<Enum, TriggerWithParameters<Entity[]>> ActorTargetTriggers =
-            new();
+        private static readonly Dictionary<Enum, TriggerWithParameters<CapabilityProcessData>> Triggers = new();
 
-        protected static TriggerWithParameters<Entity[]> GetActorTargetTrigger(Enum trigger)
+        protected static TriggerWithParameters<CapabilityProcessData> GetTrigger(Enum trigger)
         {
-            return ActorTargetTriggers[trigger];
+            if (!Triggers.TryGetValue(trigger, out var dataTrigger))
+            {
+                dataTrigger = new TriggerWithParameters<CapabilityProcessData>(trigger);
+                Triggers[trigger] = dataTrigger;
+            }
+            return dataTrigger;
         }
 
-        protected static void AddActorTargetTrigggers<T>() where T : struct, Enum
-        {
-            foreach (var enumValue in Enum.GetValues<T>())
-                ActorTargetTriggers.Add(enumValue, new TriggerWithParameters<Entity[]>(enumValue));
-        }
+        // protected static void AddActorTargetTrigggers<T>() where T : struct, Enum
+        // {
+        //     foreach (var enumValue in Enum.GetValues<T>())
+        //         Triggers.Add(enumValue, new TriggerWithParameters<CapabilityProcessData>(enumValue));
+        // }
 
         public string Id => StateHelper.Id(this);
 
@@ -79,6 +83,11 @@ namespace ExoActive
         {
             OnTransitionCompleted += TransitionHandler;
             TimeTicker.TickEvent += OnTickEvent;
+        }
+
+        public void Fire(Enum trigger, CapabilityProcessData data)
+        {
+            base.Fire(GetTrigger(trigger), data);
         }
 
         private sealed class DefaultEqualityComparer : IEqualityComparer<State>
