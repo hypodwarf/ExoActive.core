@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ExoActive;
 using JsonNetConverters;
 using Newtonsoft.Json;
@@ -106,6 +107,20 @@ namespace Tests
             var dEntity = Deserialize<TestEntity>(jsonString);
 
             Assert.That(dEntity, Is.EqualTo(entity).Using(Entity.DefaultComparer));
+        }
+
+        [Test]
+        public void ManagerSerialization()
+        {
+            var e = Manager.New<TestEntity>();
+            var jsonString = Serialize(Manager.Entities);
+            
+            // Console.WriteLine(jsonString);
+
+            Dictionary<Guid, Entity> dict = Deserialize<Dictionary<Guid, Entity>>(jsonString);
+
+            Assert.True(Manager.Entities.Keys.SequenceEqual(dict.Keys));
+            Assert.True(Manager.Entities.Values.SequenceEqual(dict.Values, Entity.DefaultComparer));
         }
     }
 }

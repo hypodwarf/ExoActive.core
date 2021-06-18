@@ -107,6 +107,7 @@ namespace ExoActive
 
         private readonly Enum trigger;
         private readonly IRequirement.Check requirement;
+        
         private CapabilityTriggerProcess(Enum trigger)
         {
             this.trigger = trigger;

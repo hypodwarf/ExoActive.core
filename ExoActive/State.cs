@@ -60,12 +60,6 @@ namespace ExoActive
             return dataTrigger;
         }
 
-        // protected static void AddActorTargetTrigggers<T>() where T : struct, Enum
-        // {
-        //     foreach (var enumValue in Enum.GetValues<T>())
-        //         Triggers.Add(enumValue, new TriggerWithParameters<CapabilityProcessData>(enumValue));
-        // }
-
         public string Id => StateHelper.Id(this);
 
         [DataMember] public ulong LastTransitionTick { get; private set; }

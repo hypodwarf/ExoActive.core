@@ -8,9 +8,13 @@ namespace ExoActive
     [DataContract]
     public abstract class Entity
     {
+        [DataMember] public readonly Guid guid = Guid.NewGuid();
         [DataMember] protected readonly Dictionary<string, State> states = new();
         [DataMember] protected readonly Attributes attributes = new();
         [DataMember] protected readonly Traits traits = new();
+        
+        public Attributes Attributes => attributes;
+        public Traits Traits => traits;
 
         public bool IsPermittedTrigger<S>(Enum trigger) where S : State, new()
         {
@@ -33,10 +37,6 @@ namespace ExoActive
             return states.ContainsKey(StateHelper<S>.Id);
         }
 
-        public Attributes Attributes => attributes;
-
-        public Traits Traits => traits;
-
         private sealed class DefaultEqualityComparer : IEqualityComparer<Entity>
         {
             public bool Equals(Entity x, Entity y)
@@ -45,7 +45,8 @@ namespace ExoActive
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return x.states.Keys.SequenceEqual(y.states.Keys)
+                return x.guid.Equals(y.guid)
+                       && x.states.Keys.SequenceEqual(y.states.Keys)
                        && x.states.Values.SequenceEqual(y.states.Values, State.DefaultComparer)
                        && Attributes.DefaultComparer.Equals(x.attributes, y.attributes)
                        && Traits.DefaultComparer.Equals(x.traits, y.traits);
