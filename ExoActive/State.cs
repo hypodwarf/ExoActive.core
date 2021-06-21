@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace ExoActive
@@ -62,6 +63,8 @@ namespace ExoActive
 
         public string Id => StateHelper.Id(this);
 
+        [DataMember] public EntitySet Entities { get; } = new EntitySet();
+
         [DataMember] public ulong LastTransitionTick { get; private set; }
 
         protected virtual void OnTickEvent()
@@ -92,12 +95,14 @@ namespace ExoActive
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return x.CurrentState.Equals(y.CurrentState) && x.LastTransitionTick == y.LastTransitionTick;
+                return x.CurrentState.Equals(y.CurrentState) 
+                       && x.LastTransitionTick == y.LastTransitionTick
+                       && x.Entities.SequenceEqual(y.Entities);
             }
 
             public int GetHashCode(State obj)
             {
-                return HashCode.Combine(obj.CurrentState, obj.LastTransitionTick);
+                return HashCode.Combine(obj.CurrentState, obj.LastTransitionTick, obj.Entities);
             }
         }
 

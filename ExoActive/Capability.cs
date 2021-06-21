@@ -32,9 +32,9 @@ namespace ExoActive
     
     public class CapabilityStateProcess<S> : ICapabilityProcess where S : State, new()
     {
-        public static Action<Entity> FireAction(Enum trigger)
+        public static Action<CapabilityProcessData> FireAction(Enum trigger)
         {
-            return entity => entity.GetState<S>().Fire(trigger);
+            return data => data.subject.GetState<S>().Fire(trigger, data);
         }
 
         public static CapabilityStateProcess<S> CreateFireAction(Enum trigger)
@@ -50,17 +50,18 @@ namespace ExoActive
                 });
         }
 
-        public static CapabilityStateProcess<S> Create(Action<Entity>[] actions, IRequirement.Check[] requirements)
+        public static CapabilityStateProcess<S> Create(Action<CapabilityProcessData>[] actions, IRequirement.Check[] requirements)
         {
-            var capabilityAction = new CapabilityStateProcess<S>();
-            foreach (var action in actions) capabilityAction.ActionEvent += action;
+            var capabilityProcess = new CapabilityStateProcess<S>();
+            foreach (var action in actions) capabilityProcess.ActionEvent += action;
 
-            foreach (var requirement in requirements) capabilityAction.Requirements.Add(requirement);
+            foreach (var requirement in requirements) capabilityProcess.Requirements.Add(requirement);
 
-            return capabilityAction;
+            return capabilityProcess;
         }
 
-        protected event Action<Entity> ActionEvent;
+        protected event Action<CapabilityProcessData> ActionEvent;
+        
         protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
 
         protected static State GetState(Entity entity)
@@ -81,7 +82,7 @@ namespace ExoActive
 
         public virtual void PerformAction(CapabilityProcessData data)
         {
-            ActionEvent?.Invoke(data.subject);
+            ActionEvent?.Invoke(data);
         }
     }
 

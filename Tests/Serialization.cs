@@ -75,6 +75,7 @@ namespace Tests
         {
             var cup = new Cup();
             cup.Fire(Cup.Trigger.Fill);
+            cup.Fire(Cup.Trigger.Fill);
             var jsonString = Serialize(cup);
 
             Console.WriteLine(jsonString);

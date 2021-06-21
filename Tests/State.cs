@@ -1,3 +1,4 @@
+using System;
 using ExoActive;
 using NUnit.Framework;
 
@@ -28,17 +29,19 @@ namespace Tests
         {
             Configure(State.Empty)
                 .OnEntry(() => Amount = 0)
-                .PermitIf(GetTrigger(Trigger.Fill), State.HalfFull);
+                .OnEntryFrom(GetTrigger(Trigger.Drink), data => Entities.Remove(data.subject))
+                .Permit(Trigger.Fill, State.HalfFull);
 
             Configure(State.HalfFull)
                 .OnEntryFrom(Trigger.Fill, () => Amount = 50)
                 .OnEntryFrom(Trigger.Drink, () => Amount = 50)
-                .PermitIf(GetTrigger(Trigger.Fill), State.Full)
-                .PermitIf(GetTrigger(Trigger.Drink), State.Empty);
+                .Permit(Trigger.Fill, State.Full)
+                .Permit(Trigger.Drink, State.Empty);
 
             Configure(State.Full)
                 .OnEntry(() => Amount = 100)
-                .PermitIf(GetTrigger(Trigger.Drink), State.HalfFull);
+                .OnEntryFrom(GetTrigger(Trigger.Fill), data => Entities.Add(data.subject))
+                .Permit(Trigger.Drink, State.HalfFull);
         }
     }
 

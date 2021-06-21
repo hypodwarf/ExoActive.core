@@ -21,6 +21,15 @@ namespace ExoActive
             return entity;
         }
 
-        public static Entity Get(Guid guid) => entities[guid];
+        public static Entity Get(Guid guid) => guid.Equals(Guid.Empty) ? null : entities[guid];
+    }
+
+    public class EntitySet : HashSet<Guid>
+    {
+        public bool Add(Entity entity) => Add(entity?.guid ?? Guid.Empty);
+
+        public bool Remove(Entity entity) => Remove(entity?.guid ?? Guid.Empty);
+
+        public bool Contains(Entity entity) => Contains(entity?.guid ?? Guid.Empty);
     }
 }
