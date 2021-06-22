@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Net;
 
 namespace ExoActive
 {
     public struct CapabilityProcessData
     {
+        [Flags] public enum DataFilter
+        {
+            Subject = 1 << 0,
+            Actors = 1 << 1,
+            Targets = 1 << 2
+        }
         public Entity subject;
         public List<Entity> actors;
         public List<Entity> targets;
@@ -93,43 +101,121 @@ namespace ExoActive
      */
     public class CapabilityTriggerProcess<S> : ICapabilityProcess where S : State, new()
     {
-        private static readonly Dictionary<Enum, CapabilityTriggerProcess<S>> processes = new ();
+        private static readonly Dictionary<(Enum, CapabilityProcessData.DataFilter), CapabilityTriggerProcess<S>> processes = new ();
 
-        public static CapabilityTriggerProcess<S> Get(Enum trigger)
+        public static CapabilityTriggerProcess<S> Get(Enum trigger, CapabilityProcessData.DataFilter dataFilter = CapabilityProcessData.DataFilter.Subject)
         {
-            if (!processes.TryGetValue(trigger, out var process))
+            if (!processes.TryGetValue((trigger, dataFilter), out var process))
             {
-                process = new CapabilityTriggerProcess<S>(trigger);
-                processes[trigger] = process;
+                process = new CapabilityTriggerProcess<S>(trigger, dataFilter);
+                processes[(trigger, dataFilter)] = process;
             }
 
             return process;
         }
 
         private readonly Enum trigger;
+        private readonly CapabilityProcessData.DataFilter dataFilter;
         private readonly IRequirement.Check requirement;
         
-        private CapabilityTriggerProcess(Enum trigger)
+        private CapabilityTriggerProcess(Enum trigger, CapabilityProcessData.DataFilter dataFilter)
         {
             this.trigger = trigger;
+            this.dataFilter = dataFilter;
             this.requirement = StateRequirement<S>.Create(trigger);
+        }
+
+        private bool PassesRequirements(CapabilityProcessData data, Entity entity)
+        {
+            if (!entity.HasState<S>()) entity.AddState(StateHelper<S>.CreateState());
+            return requirement(entity);
         }
 
         public bool PassesRequirements(CapabilityProcessData data)
         {
-            if (!data.subject.HasState<S>()) data.subject.AddState(StateHelper<S>.CreateState());
-            return requirement(data.subject);
+            bool passes = true;
+            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Subject))
+            {
+                passes &= PassesRequirements(data, data.subject);
+            }
+            
+            if (passes && dataFilter.HasFlag(CapabilityProcessData.DataFilter.Actors))
+            {
+                passes &= data.actors.All(actor => PassesRequirements(data, actor));
+            }
+            
+            if (passes && dataFilter.HasFlag(CapabilityProcessData.DataFilter.Targets))
+            {
+                passes &= data.targets.All(target => PassesRequirements(data, target));
+            }
+
+            return passes;
         }
 
-        public virtual void PerformAction(CapabilityProcessData data)
+        private void PerformAction(CapabilityProcessData data, Entity entity)
         {
-            data.subject.GetState<S>().Fire(trigger, data);
+            entity.GetState<S>().Fire(trigger, data);
+        }
+
+        public void PerformAction(CapabilityProcessData data)
+        {
+            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Subject))
+            {
+                PerformAction(data, data.subject);
+            }
+            
+            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Actors))
+            {
+                data.actors.ForEach(actor => PerformAction(data, actor));
+            }
+            
+            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Targets))
+            {
+                data.targets.ForEach(target => PerformAction(data, target));
+            }
+        }
+    }
+
+    public class DelegateCheckProcess : ICapabilityProcess
+    {
+        public static DelegateCheckProcess IsTrue(DelegateCheck check)
+        {
+            return new DelegateCheckProcess(check, true);
+        }
+        
+        public static DelegateCheckProcess IsFalse(DelegateCheck check)
+        {
+            return new DelegateCheckProcess(check, false);
+        }
+        
+        public delegate bool DelegateCheck(CapabilityProcessData data);
+
+        private readonly DelegateCheck check;
+        private readonly bool checkResult;
+
+        private DelegateCheckProcess(DelegateCheck check, bool checkResult)
+        {
+            this.check = check;
+            this.checkResult = checkResult;
+        }
+
+        public bool PassesRequirements(CapabilityProcessData data)
+        {
+            return check(data) == checkResult;
+        }
+
+        public void PerformAction(CapabilityProcessData data)
+        {
         }
     }
 
     public abstract class Capability : ICapability
     {
         private static readonly Dictionary<Type, Capability> capabilities = new();
+
+        static Capability()
+        {
+        }
 
         public static Capability Get<C>() where C : Capability, new()
         {

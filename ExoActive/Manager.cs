@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace ExoActive
 {
@@ -22,6 +23,14 @@ namespace ExoActive
         }
 
         public static Entity Get(Guid guid) => guid.Equals(Guid.Empty) ? null : entities[guid];
+        
+        public class ManagedEntity : ExoActive.Entity
+        {
+            protected ManagedEntity()
+            {
+                Manager.entities.Add(this.guid, this);
+            }
+        }
     }
 
     public class EntitySet : HashSet<Guid>
@@ -31,5 +40,7 @@ namespace ExoActive
         public bool Remove(Entity entity) => Remove(entity?.guid ?? Guid.Empty);
 
         public bool Contains(Entity entity) => Contains(entity?.guid ?? Guid.Empty);
+
+        public override string ToString() => this.Aggregate("", (s, guid) => $"{(s.Length>0 ? $"{s}, " : s)}{guid}");
     }
 }

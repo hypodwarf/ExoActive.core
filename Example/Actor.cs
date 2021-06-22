@@ -2,7 +2,7 @@ using ExoActive;
 
 namespace Example
 {
-    public class Actor : Entity
+    public class Actor : Manager.ManagedEntity
     {
         public Actor()
         {

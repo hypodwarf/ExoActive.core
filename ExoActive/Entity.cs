@@ -26,10 +26,10 @@ namespace ExoActive
             states.Add(state.Id, state);
         }
 
-        public State GetState<S>() where S : State, new()
+        public S GetState<S>() where S : State, new()
         {
             var stateId = StateHelper<S>.Id;
-            return states[stateId];
+            return (S)states[stateId];
         }
 
         public bool HasState<S>() where S : State, new()
