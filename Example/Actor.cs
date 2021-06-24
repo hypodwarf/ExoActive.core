@@ -8,7 +8,8 @@ namespace Example
         {
             attributes.Add(PhysicalAttributes.Strength, 10);
             attributes.Add(PhysicalAttributes.Weight, 3);
-            traits.Add(PhysicalTraits.CanCarry);
+            attributes.Add(LiftingAttributes.Limbs, 2);
+            traits.Add(LiftingTraits.CanLift);
         }
     }
 }

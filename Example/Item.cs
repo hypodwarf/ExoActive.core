@@ -7,7 +7,8 @@ namespace Example
         public Item()
         {
             attributes.Add(PhysicalAttributes.Weight, 2);
-            traits.Add(PhysicalTraits.Carriable);
+            attributes.Add(LiftingAttributes.Holds, 2);
+            traits.Add(LiftingTraits.Lifteable);
         }
     }
 }
