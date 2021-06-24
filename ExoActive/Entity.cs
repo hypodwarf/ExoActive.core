@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace ExoActive
 {
     [DataContract]
-    public abstract class Entity
+    public abstract partial class Entity
     {
         [DataMember] public readonly Guid guid = Guid.NewGuid();
         [DataMember] protected readonly Dictionary<string, State> states = new();
@@ -16,9 +16,9 @@ namespace ExoActive
         public Attributes Attributes => attributes;
         public Traits Traits => traits;
 
-        public bool IsPermittedTrigger<S>(Enum trigger) where S : State, new()
+        public bool IsPermittedTrigger<S>(Enum trigger, CapabilityProcessData data) where S : State, new()
         {
-            return GetState<S>().PermittedTriggers.Contains(trigger);
+            return GetState<S>().GetPermittedTriggers(data).Contains(trigger);
         }
 
         public void AddState(State state)
@@ -36,28 +36,5 @@ namespace ExoActive
         {
             return states.ContainsKey(StateHelper<S>.Id);
         }
-
-        private sealed class DefaultEqualityComparer : IEqualityComparer<Entity>
-        {
-            public bool Equals(Entity x, Entity y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.guid.Equals(y.guid)
-                       && x.states.Keys.SequenceEqual(y.states.Keys)
-                       && x.states.Values.SequenceEqual(y.states.Values, State.DefaultComparer)
-                       && Attributes.DefaultComparer.Equals(x.attributes, y.attributes)
-                       && Traits.DefaultComparer.Equals(x.traits, y.traits);
-            }
-
-            public int GetHashCode(Entity entity)
-            {
-                return HashCode.Combine(entity.states, entity.attributes, entity.traits);
-            }
-        }
-
-        public static IEqualityComparer<Entity> DefaultComparer { get; } = new DefaultEqualityComparer();
     }
 }

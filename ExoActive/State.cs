@@ -47,7 +47,7 @@ namespace ExoActive
     }
 
     [DataContract]
-    public abstract class State : StateMachine<Enum, Enum>
+    public abstract partial class State : StateMachine<Enum, Enum>
     {
         private static readonly Dictionary<Enum, TriggerWithParameters<CapabilityProcessData>> Triggers = new();
 
@@ -62,8 +62,8 @@ namespace ExoActive
         }
 
         public string Id => StateHelper.Id(this);
-
-        [DataMember] public EntitySet Entities { get; } = new EntitySet();
+        
+        [DataMember] public EntitySet Entities { get; private init; }
 
         [DataMember] public ulong LastTransitionTick { get; private set; }
 
@@ -80,6 +80,7 @@ namespace ExoActive
         {
             OnTransitionCompleted += TransitionHandler;
             TimeTicker.TickEvent += OnTickEvent;
+            Entities = new EntitySet();
         }
 
         public void Fire(Enum trigger, CapabilityProcessData data)
@@ -87,26 +88,10 @@ namespace ExoActive
             base.Fire(GetTrigger(trigger), data);
         }
 
-        private sealed class DefaultEqualityComparer : IEqualityComparer<State>
+        public override string ToString()
         {
-            public bool Equals(State x, State y)
-            {
-                if (ReferenceEquals(x, y)) return true;
-                if (ReferenceEquals(x, null)) return false;
-                if (ReferenceEquals(y, null)) return false;
-                if (x.GetType() != y.GetType()) return false;
-                return x.CurrentState.Equals(y.CurrentState) 
-                       && x.LastTransitionTick == y.LastTransitionTick
-                       && x.Entities.SequenceEqual(y.Entities);
-            }
-
-            public int GetHashCode(State obj)
-            {
-                return HashCode.Combine(obj.CurrentState, obj.LastTransitionTick, obj.Entities);
-            }
+            return $"{base.ToString()}, LastTick = {LastTransitionTick}, EntitiesCount = {Entities.Count}";
         }
-
-        public static IEqualityComparer<State> DefaultComparer { get; } = new DefaultEqualityComparer();
     }
 
     public static class StateHelper<S> where S : State, new()

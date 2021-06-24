@@ -116,12 +116,27 @@ namespace Tests
             var e = Manager.New<TestEntity>();
             var jsonString = Serialize(Manager.Entities);
             
-            // Console.WriteLine(jsonString);
+            Console.WriteLine(jsonString);
 
             Dictionary<Guid, Entity> dict = Deserialize<Dictionary<Guid, Entity>>(jsonString);
 
             Assert.True(Manager.Entities.Keys.SequenceEqual(dict.Keys));
             Assert.True(Manager.Entities.Values.SequenceEqual(dict.Values, Entity.DefaultComparer));
+        }
+
+        [Test]
+        public void EntitySetSerialization()
+        {
+            var attr = new Attributes();
+            attr.Add(AttributeGroupTests.types.T0, 1, "T-Zero");
+            
+            var es = new EntitySet {{Guid.NewGuid(), attr}};
+
+            var jsonString = Serialize(es);
+            
+            Console.WriteLine(jsonString);
+            var dEs = Deserialize<EntitySet>(jsonString);
+            Assert.That(es.SequenceEqual(dEs));
         }
     }
 }

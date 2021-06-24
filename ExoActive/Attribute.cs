@@ -15,7 +15,7 @@ namespace ExoActive
      * temporary changes to the base value.
      */
     [DataContract]
-    public readonly struct Attribute<T> : IEquatable<Attribute<T>>
+    public readonly partial struct Attribute<T>
     {
         [DataMember] public readonly NamedValue<T> namedValue;
         [DataMember] private readonly Attribute<T>[] modifiers;
@@ -112,35 +112,6 @@ namespace ExoActive
         }
 
         public ReadOnlyCollection<Attribute<T>> Modifiers => new(modifiers);
-
-        public bool Equals(Attribute<T> other)
-        {
-            return namedValue.Equals(other.namedValue)
-                   && modifiers.SequenceEqual(other.modifiers)
-                   && modifiedValue.Equals(other.modifiedValue)
-                   && guid.Equals(other.guid)
-                   && version == other.version;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Attribute<T> other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(namedValue, modifiers, modifiedValue, guid, version);
-        }
-
-        public static bool operator ==(Attribute<T> left, Attribute<T> right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Attribute<T> left, Attribute<T> right)
-        {
-            return !left.Equals(right);
-        }
     }
 
     public readonly struct AttributeHelper
@@ -157,7 +128,7 @@ namespace ExoActive
         }
     }
 
-    public readonly struct NamedValue<T> : IEquatable<NamedValue<T>>
+    public readonly partial struct NamedValue<T>
     {
         public readonly string name;
         public readonly T value;
@@ -166,99 +137,6 @@ namespace ExoActive
         {
             this.name = name;
             this.value = value;
-        }
-
-        public static NamedValue<T> operator +(NamedValue<T> lv, NamedValue<T> rv)
-        {
-            T value;
-            try
-            {
-                value = (dynamic) lv.value + rv.value;
-            }
-            catch (RuntimeBinderException e)
-            {
-                Console.Error.WriteLine(e.ToString());
-                // The values cannot be added, so the value from lv is used.
-                value = lv.value;
-            }
-
-            return new NamedValue<T>($"{lv.name} + {rv.name}", value);
-        }
-
-        public static NamedValue<T> operator -(NamedValue<T> lv, NamedValue<T> rv)
-        {
-            T value;
-            try
-            {
-                value = (dynamic) lv.value - rv.value;
-            }
-            catch (RuntimeBinderException e)
-            {
-                Console.Error.WriteLine(e.ToString());
-                // The values cannot be subtracted, so the value from lv is used.
-                value = lv.value;
-            }
-
-            return new NamedValue<T>($"{lv.name} - {rv.name}", value);
-        }
-
-        public static NamedValue<T> operator *(NamedValue<T> lv, NamedValue<T> rv)
-        {
-            T value;
-            try
-            {
-                value = (dynamic) lv.value * rv.value;
-            }
-            catch (RuntimeBinderException e)
-            {
-                Console.Error.WriteLine(e.ToString());
-                // The values cannot be mulitplied, so the value from lv is used.
-                value = lv.value;
-            }
-
-            return new NamedValue<T>($"{lv.name} * {rv.name}", value);
-        }
-
-        public static NamedValue<T> operator /(NamedValue<T> lv, NamedValue<T> rv)
-        {
-            T value;
-            try
-            {
-                value = (dynamic) lv.value / rv.value;
-            }
-            catch (RuntimeBinderException e)
-            {
-                Console.Error.WriteLine(e.ToString());
-                // The values cannot be divided, so the value from lv is used.
-                value = lv.value;
-            }
-
-            return new NamedValue<T>($"{lv.name} / {rv.name}", value);
-        }
-
-        public bool Equals(NamedValue<T> other)
-        {
-            return name == other.name && EqualityComparer<T>.Default.Equals(value, other.value);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is NamedValue<T> other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(name, value);
-        }
-
-        public static bool operator ==(NamedValue<T> left, NamedValue<T> right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(NamedValue<T> left, NamedValue<T> right)
-        {
-            return !left.Equals(right);
         }
     }
 }

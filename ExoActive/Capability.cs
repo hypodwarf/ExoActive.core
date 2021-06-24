@@ -8,12 +8,12 @@ namespace ExoActive
 {
     public struct CapabilityProcessData
     {
-        [Flags] public enum DataFilter
-        {
-            Subject = 1 << 0,
-            Actors = 1 << 1,
-            Targets = 1 << 2
-        }
+        // [Flags] public enum DataFilter
+        // {
+        //     Subject = 1 << 0,
+        //     Actors = 1 << 1,
+        //     Targets = 1 << 2
+        // }
         public Entity subject;
         public List<Entity> actors;
         public List<Entity> targets;
@@ -44,50 +44,50 @@ namespace ExoActive
         {
             return data => data.subject.GetState<S>().Fire(trigger, data);
         }
-
-        public static CapabilityStateProcess<S> CreateFireAction(Enum trigger)
-        {
-            return Create(
-                new[]
-                {
-                    FireAction(trigger)
-                },
-                new[]
-                {
-                    StateRequirement<S>.Create(trigger)
-                });
-        }
-
+    
+        // public static CapabilityStateProcess<S> CreateFireAction(Enum trigger)
+        // {
+        //     return Create(
+        //         new[]
+        //         {
+        //             FireAction(trigger)
+        //         },
+        //         new[]
+        //         {
+        //             StateRequirement<S>.Create(trigger)
+        //         });
+        // }
+    
         public static CapabilityStateProcess<S> Create(Action<CapabilityProcessData>[] actions, IRequirement.Check[] requirements)
         {
             var capabilityProcess = new CapabilityStateProcess<S>();
             foreach (var action in actions) capabilityProcess.ActionEvent += action;
-
+    
             foreach (var requirement in requirements) capabilityProcess.Requirements.Add(requirement);
-
+    
             return capabilityProcess;
         }
-
+    
         protected event Action<CapabilityProcessData> ActionEvent;
         
         protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
-
+    
         protected static State GetState(Entity entity)
         {
             return entity.GetState<S>();
         }
-
+    
         protected virtual S CreateState()
         {
             return StateHelper<S>.CreateState();
         }
-
+    
         public bool PassesRequirements(CapabilityProcessData data)
         {
             if (!data.subject.HasState<S>()) data.subject.AddState(CreateState());
-            return Requirements.All(req => req(data.subject));
+            return Requirements.All(req => req(data.subject, data));
         }
-
+    
         public virtual void PerformAction(CapabilityProcessData data)
         {
             ActionEvent?.Invoke(data);
@@ -101,78 +101,37 @@ namespace ExoActive
      */
     public class CapabilityTriggerProcess<S> : ICapabilityProcess where S : State, new()
     {
-        private static readonly Dictionary<(Enum, CapabilityProcessData.DataFilter), CapabilityTriggerProcess<S>> processes = new ();
+        private static readonly Dictionary<Enum, CapabilityTriggerProcess<S>> processes = new ();
 
-        public static CapabilityTriggerProcess<S> Get(Enum trigger, CapabilityProcessData.DataFilter dataFilter = CapabilityProcessData.DataFilter.Subject)
+        public static CapabilityTriggerProcess<S> Get(Enum trigger)
         {
-            if (!processes.TryGetValue((trigger, dataFilter), out var process))
+            if (!processes.TryGetValue(trigger, out var process))
             {
-                process = new CapabilityTriggerProcess<S>(trigger, dataFilter);
-                processes[(trigger, dataFilter)] = process;
+                process = new CapabilityTriggerProcess<S>(trigger);
+                processes[trigger] = process;
             }
 
             return process;
         }
 
         private readonly Enum trigger;
-        private readonly CapabilityProcessData.DataFilter dataFilter;
         private readonly IRequirement.Check requirement;
         
-        private CapabilityTriggerProcess(Enum trigger, CapabilityProcessData.DataFilter dataFilter)
+        private CapabilityTriggerProcess(Enum trigger)
         {
             this.trigger = trigger;
-            this.dataFilter = dataFilter;
             this.requirement = StateRequirement<S>.Create(trigger);
-        }
-
-        private bool PassesRequirements(CapabilityProcessData data, Entity entity)
-        {
-            if (!entity.HasState<S>()) entity.AddState(StateHelper<S>.CreateState());
-            return requirement(entity);
         }
 
         public bool PassesRequirements(CapabilityProcessData data)
         {
-            bool passes = true;
-            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Subject))
-            {
-                passes &= PassesRequirements(data, data.subject);
-            }
-            
-            if (passes && dataFilter.HasFlag(CapabilityProcessData.DataFilter.Actors))
-            {
-                passes &= data.actors.All(actor => PassesRequirements(data, actor));
-            }
-            
-            if (passes && dataFilter.HasFlag(CapabilityProcessData.DataFilter.Targets))
-            {
-                passes &= data.targets.All(target => PassesRequirements(data, target));
-            }
-
-            return passes;
-        }
-
-        private void PerformAction(CapabilityProcessData data, Entity entity)
-        {
-            entity.GetState<S>().Fire(trigger, data);
+            if (!data.subject.HasState<S>()) data.subject.AddState(StateHelper<S>.CreateState());
+            return requirement(data.subject, data);
         }
 
         public void PerformAction(CapabilityProcessData data)
         {
-            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Subject))
-            {
-                PerformAction(data, data.subject);
-            }
-            
-            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Actors))
-            {
-                data.actors.ForEach(actor => PerformAction(data, actor));
-            }
-            
-            if (dataFilter.HasFlag(CapabilityProcessData.DataFilter.Targets))
-            {
-                data.targets.ForEach(target => PerformAction(data, target));
-            }
+            data.subject.GetState<S>().Fire(trigger, data);
         }
     }
 
@@ -241,6 +200,11 @@ namespace ExoActive
         public static bool PerformAction<C>(Entity actor, params Entity[] targets) where C : Capability, new()
         {
             return PerformAction<C>(new List<Entity> {actor}, targets.ToList());
+        }
+        
+        public static bool PerformAction<C>(Entity[] actors, params Entity[] targets) where C : Capability, new()
+        {
+            return PerformAction<C>(actors.ToList(), targets.ToList());
         }
 
 

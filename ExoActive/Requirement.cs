@@ -4,9 +4,9 @@ namespace ExoActive
 {
     public interface IRequirement
     {
-        public bool Passes(Entity entity);
+        public bool Passes(Entity entity, CapabilityProcessData data);
 
-        public delegate bool Check(Entity entity);
+        public delegate bool Check(Entity entity, CapabilityProcessData data = default);
     }
 
     public class TraitRequirement : IRequirement
@@ -20,7 +20,7 @@ namespace ExoActive
             RequiredValue = requiredValue;
         }
 
-        public bool Passes(Entity entity)
+        public bool Passes(Entity entity, CapabilityProcessData data)
         {
             return entity.Traits.Has(Trait) == RequiredValue;
         }
@@ -28,7 +28,7 @@ namespace ExoActive
         public static IRequirement.Check Create(Enum trait, bool requiredValue = true)
         {
             var req = new TraitRequirement(trait, requiredValue);
-            return entity => req.Passes(entity);
+            return (entity, data) => req.Passes(entity, data);
         }
     }
 
@@ -47,7 +47,7 @@ namespace ExoActive
             Evaluation = evaluation;
         }
 
-        public bool Passes(Entity entity)
+        public bool Passes(Entity entity, CapabilityProcessData data)
         {
             return Evaluation(entity.Attributes.GetAttributeValue(Attribute), Threshold);
         }
@@ -55,7 +55,7 @@ namespace ExoActive
         public static IRequirement.Check Create(Enum attribute, int threshold, Evaluate evaluation)
         {
             var req = new AttributeRequirement(attribute, threshold, evaluation);
-            return entity => req.Passes(entity);
+            return (entity, data) => req.Passes(entity, data);
         }
     }
 
@@ -70,15 +70,15 @@ namespace ExoActive
             Permitted = permitted;
         }
 
-        public bool Passes(Entity entity)
+        public bool Passes(Entity entity, CapabilityProcessData data)
         {
-            return entity.IsPermittedTrigger<S>(Trigger) == Permitted;
+            return entity.IsPermittedTrigger<S>(Trigger, data) == Permitted;
         }
 
         public static IRequirement.Check Create(Enum trigger, bool permitted = true)
         {
             var req = new StateRequirement<S>(trigger, permitted);
-            return entity => req.Passes(entity);
+            return (entity, data) => req.Passes(entity, data);
         }
     }
 }

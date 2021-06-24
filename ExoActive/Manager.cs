@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace ExoActive
 {
@@ -33,14 +34,16 @@ namespace ExoActive
         }
     }
 
-    public class EntitySet : HashSet<Guid>
+    public class EntitySet : Dictionary<Guid, Attributes>
     {
-        public bool Add(Entity entity) => Add(entity?.guid ?? Guid.Empty);
+        public Attributes Get(Entity entity) => base[entity?.guid ?? Guid.Empty];
+        
+        public bool Add(Entity entity) => TryAdd(entity?.guid ?? Guid.Empty, new Attributes());
 
         public bool Remove(Entity entity) => Remove(entity?.guid ?? Guid.Empty);
 
-        public bool Contains(Entity entity) => Contains(entity?.guid ?? Guid.Empty);
+        public bool Contains(Entity entity) => Keys.Contains(entity?.guid ?? Guid.Empty);
 
-        public override string ToString() => this.Aggregate("", (s, guid) => $"{(s.Length>0 ? $"{s}, " : s)}{guid}");
+        public override string ToString() => this.Aggregate("", (s, guid) => $"{(s.Length>0 ? $"{s}, " : s)}{guid.Key}");
     }
 }
