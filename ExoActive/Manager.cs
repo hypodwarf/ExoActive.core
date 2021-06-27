@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Security.Claims;
 
 namespace ExoActive
 {
@@ -36,14 +37,36 @@ namespace ExoActive
 
     public class EntitySet : Dictionary<Guid, Attributes>
     {
-        public Attributes Get(Entity entity) => base[entity?.guid ?? Guid.Empty];
-        
-        public bool Add(Entity entity) => TryAdd(entity?.guid ?? Guid.Empty, new Attributes());
+        public bool Add(Entity entity, params Enum[] types)
+        {
+            var attributes = new Attributes();
+            foreach (var type in types)
+            {
+                attributes.Add(type);
+            }
+            return TryAdd(entity?.guid ?? Guid.Empty, attributes);
+        }
 
         public bool Remove(Entity entity) => Remove(entity?.guid ?? Guid.Empty);
 
         public bool Contains(Entity entity) => Keys.Contains(entity?.guid ?? Guid.Empty);
 
+        public Attributes this[Entity entity]
+        {
+            get => base[entity?.guid ?? Guid.Empty];
+            set => base[entity?.guid ?? Guid.Empty] = value;
+        }
+
+        public List<Entity> List
+        {
+            get => this.Aggregate(new List<Entity>(this.Count),
+                (acc, kvp) =>
+                {
+                    acc.Add(Manager.Get(kvp.Key));
+                    return acc;
+                });
+        }
+        
         public override string ToString() => this.Aggregate("", (s, guid) => $"{(s.Length>0 ? $"{s}, " : s)}{guid.Key}");
     }
 }

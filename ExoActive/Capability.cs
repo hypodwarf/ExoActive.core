@@ -227,8 +227,10 @@ namespace ExoActive
         {
             if (PassesRequirements(actors, targets))
             {
+                BeforeAction(actors, targets);
                 actorActions.ForEach(action => actors.ForEach(actor => action.PerformAction(new CapabilityProcessData(actor, actors, targets))));
                 if (targets != null) targetActions.ForEach(action => targets.ForEach(target => action.PerformAction(new CapabilityProcessData(target, actors, targets))));
+                AfterAction(actors, targets);
                 return true;
             }
 
@@ -239,5 +241,11 @@ namespace ExoActive
         {
             return PerformAction(new List<Entity> {actor}, targets.ToList());
         }
+
+        protected virtual void BeforeAction(List<Entity> actors, List<Entity> targets)
+        { }
+
+        protected virtual void AfterAction(List<Entity> actors, List<Entity> targets)
+        { }
     }
 }

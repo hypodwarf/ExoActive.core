@@ -122,6 +122,22 @@ namespace Tests
         }
 
         [Test]
+        public void CanReset()
+        {
+            var x = new Attribute<float>("a", 1);
+            var y = new Attribute<float>("u", 2);
+            var z = new Attribute<float>("v", 3);
+            
+            var x2 = x.InsertModifier(y);
+            var x3 = x2.InsertModifier(z);
+            
+            Assert.AreEqual(6f, x3.modifiedValue.value);
+
+            var x4 = x3.Reset();
+            Assert.AreEqual(x.modifiedValue.value, x4.modifiedValue.value);
+        }
+
+        [Test]
         public void CanUpdateChild()
         {
             var a = new Attribute<float>("a", 1);

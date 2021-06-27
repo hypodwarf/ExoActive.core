@@ -161,20 +161,38 @@ namespace ExoActive
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return x.attributes.SequenceEqual(y.attributes);
+                return x.SequenceEqual(y);
             }
 
             public int GetHashCode(AttributeGroup<S, T> obj)
             {
-                return obj.attributes != null ? obj.attributes.GetHashCode() : 0;
+                return obj.GetHashCode();
             }
         }
 
         public static IEqualityComparer<AttributeGroup<S, T>> DefaultComparer { get; } = new DefaultEqualityComparer();
     }
 
-    public abstract partial class Entity
+    public abstract partial class Entity : IEquatable<Entity>
     {
+        public bool Equals(Entity other)
+        {
+            return DefaultComparer.Equals(this, other);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Entity) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return DefaultComparer.GetHashCode(this);
+        }
+
         private sealed class DefaultEqualityComparer : IEqualityComparer<Entity>
         {
             public bool Equals(Entity x, Entity y)

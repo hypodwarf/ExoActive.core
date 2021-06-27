@@ -100,6 +100,35 @@ namespace Tests
         }
 
         [Test]
+        public void CanResetType()
+        {
+            var g = new AttributeGroup<types, int>();
+            g.Add(types.T0, 10);
+            g.Add(types.T1, 11);
+            g.Add(types.T2, 12, "Tootsie");
+
+            g.Apply(types.T0, 100);
+            g.Apply(types.T1, 100);
+            g.Apply(types.T2, 100);
+            
+            Assert.AreEqual(110, g.GetAttributeValue(types.T0));
+            Assert.AreEqual(111, g.GetAttributeValue(types.T1));
+            Assert.AreEqual(112, g.GetAttributeValue(types.T2));
+            
+            g.Reset(types.T0, types.T2);
+            
+            Assert.AreEqual(10, g.GetAttributeValue(types.T0));
+            Assert.AreEqual(111, g.GetAttributeValue(types.T1));
+            Assert.AreEqual(12, g.GetAttributeValue(types.T2));
+            
+            g.Reset();
+            
+            Assert.AreEqual(10, g.GetAttributeValue(types.T0));
+            Assert.AreEqual(11, g.GetAttributeValue(types.T1));
+            Assert.AreEqual(12, g.GetAttributeValue(types.T2));
+        }
+
+        [Test]
         public void CanAddCircularModifications()
         {
             var g1 = new AttributeGroup<types, int>();

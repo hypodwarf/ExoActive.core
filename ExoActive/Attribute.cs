@@ -111,6 +111,8 @@ namespace ExoActive
             return i < 0 ? this : RemoveModifierAtIdx(i);
         }
 
+        public Attribute<T> Reset() => new(this, Array.Empty<Attribute<T>>());
+
         public ReadOnlyCollection<Attribute<T>> Modifiers => new(modifiers);
     }
 

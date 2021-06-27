@@ -29,7 +29,12 @@ namespace ExoActive
         public S GetState<S>() where S : State, new()
         {
             var stateId = StateHelper<S>.Id;
-            return (S)states[stateId];
+            if (!states.TryGetValue(stateId, out var state))
+            {
+                state = StateHelper<S>.CreateState();
+                AddState(state);
+            }
+            return (S)state;
         }
 
         public bool HasState<S>() where S : State, new()
