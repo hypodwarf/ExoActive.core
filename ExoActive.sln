@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExoActive", "ExoActive\ExoA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{FC40C6D5-4DCB-4C2A-ACA1-305C72776AB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{801BDAC3-94CF-4D85-80D1-3D3516426AD6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example_GroupLift", "Example_GroupLift\Example_GroupLift.csproj", "{801BDAC3-94CF-4D85-80D1-3D3516426AD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

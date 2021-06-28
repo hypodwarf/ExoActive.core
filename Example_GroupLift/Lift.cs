@@ -1,10 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ExoActive;
 
-namespace Example
+namespace Example_GroupLift
 {
     public static class Lift
     {

@@ -1,6 +1,6 @@
 using ExoActive;
 
-namespace Example
+namespace Example_GroupLift
 {
     public class Item : Manager.ManagedEntity
     {

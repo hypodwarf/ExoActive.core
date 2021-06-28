@@ -1,6 +1,6 @@
 using System;
 
-namespace Example
+namespace Example_GroupLift
 {
     [Flags]
     public enum LiftingTraits : ulong
