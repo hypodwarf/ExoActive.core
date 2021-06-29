@@ -53,14 +53,14 @@ namespace ExoActive
             return Key(typeof(E));
         }
 
-        public ulong Value<E>()
+        public E Value<E>() where E : Enum
         {
-            return traitDict.GetValueOrDefault(Key<E>(), 0UL);
+            return (E)Enum.ToObject(typeof(E), traitDict.GetValueOrDefault(Key<E>(), 0UL));
         }
 
-        public ulong Value(Type E)
+        public Enum Value(Type E)
         {
-            return traitDict.GetValueOrDefault(Key(E), 0UL);
+            return (Enum)Enum.ToObject(E, traitDict.GetValueOrDefault(Key(E), 0UL));
         }
 
         public override string ToString()

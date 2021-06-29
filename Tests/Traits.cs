@@ -7,7 +7,7 @@ namespace Tests
     [Flags]
     public enum TestFlag : ulong
     {
-        None = 0,
+        // None = 0,
         Min = 1UL << 0,
         Max = 1UL << 63
     }
@@ -17,7 +17,7 @@ namespace Tests
         [Flags]
         public enum TestFlag : ulong
         {
-            None = 0,
+            // None = 0,
             Min = 1UL << 0,
             Mid = 1UL << 31,
             Max = 1UL << 63
@@ -112,14 +112,14 @@ namespace Tests
         {
             var c = new Traits();
 
-            Assert.AreEqual(0, c.Value<TestFlag>());
+            Assert.AreEqual(Enum.ToObject(typeof(TestFlag),0), c.Value<TestFlag>());
             c.Add(TestFlag.Min);
-            Assert.AreEqual(1UL << 0, c.Value<TestFlag>());
+            Assert.AreEqual(TestFlag.Min, c.Value<TestFlag>());
             c.Add(TestFlag.Mid);
-            Assert.AreEqual((1UL << 0) | (1UL << 31), c.Value<TestFlag>());
+            Assert.AreEqual(TestFlag.Min | TestFlag.Mid, c.Value<TestFlag>());
             c.Add(TestFlag.Max);
-            Assert.AreEqual((1UL << 0) | (1UL << 31) | (1UL << 63), c.Value<TestFlag>());
-            Assert.AreEqual((1UL << 0) | (1UL << 31) | (1UL << 63), c.Value(typeof(TestFlag)));
+            Assert.AreEqual(TestFlag.Min | TestFlag.Mid | TestFlag.Max, c.Value<TestFlag>());
+            Assert.AreEqual(TestFlag.Min | TestFlag.Mid | TestFlag.Max, c.Value(typeof(TestFlag)));
         }
     }
 }

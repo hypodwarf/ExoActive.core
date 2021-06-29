@@ -7,12 +7,29 @@ namespace ExoActive
 {
     public class Attributes : AttributeGroup<Enum, int>
     {
+        public override object Clone()
+        {
+            return new Attributes(this);
+        }
+
+        public Attributes() { }
+
+        protected Attributes(Attributes copy) : base(copy) { }
     }
 
     [DataContract]
-    public partial class AttributeGroup<S, T> :  Dictionary<S, Attribute<T>>
+    public partial class AttributeGroup<S, T> :  Dictionary<S, Attribute<T>>, ICloneable
     {
         private delegate Attribute<T> AttributeAction(Attribute<T> a, Attribute<T> b);
+
+        public AttributeGroup() { }
+        
+        protected AttributeGroup(AttributeGroup<S, T> copy) : base(copy) { }
+
+        public virtual object Clone()
+        {
+            return new AttributeGroup<S, T>(this);
+        }
 
         public void Add(S type, T value = default, string name = null)
         {

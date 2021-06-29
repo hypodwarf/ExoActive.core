@@ -44,6 +44,11 @@ namespace ExoActive
             {
                 attributes.Add(type);
             }
+            return Add(entity, attributes);
+        }
+        
+        public bool Add(Entity entity, Attributes attributes)
+        {
             return TryAdd(entity?.guid ?? Guid.Empty, attributes);
         }
 

@@ -1,3 +1,4 @@
+using System;
 using ExoActive;
 using NUnit.Framework;
 
@@ -126,6 +127,45 @@ namespace Tests
             Assert.AreEqual(10, g.GetAttributeValue(types.T0));
             Assert.AreEqual(11, g.GetAttributeValue(types.T1));
             Assert.AreEqual(12, g.GetAttributeValue(types.T2));
+        }
+        
+        [Test]
+        public void CanClone()
+        {
+            var g = new AttributeGroup<types, int> {{types.T0, 10}, {types.T1, 11}, {types.T2, 12, "Tootsie"}};
+            var g2 = new AttributeGroup<types, int> {{types.T0, 100}, {types.T1, 100}, {types.T2, 100, "Thrice"}};
+
+            g.Apply(g2);
+            
+            Assert.AreEqual(110, g.GetAttributeValue(types.T0));
+            Assert.AreEqual(111, g.GetAttributeValue(types.T1));
+            Assert.AreEqual(112, g.GetAttributeValue(types.T2));
+
+            var clone = (AttributeGroup<types, int>)g.Clone();
+            
+            Assert.AreEqual(110, clone.GetAttributeValue(types.T0));
+            Assert.AreEqual(111, clone.GetAttributeValue(types.T1));
+            Assert.AreEqual(112, clone.GetAttributeValue(types.T2));
+            
+            g.Apply(types.T0, 1000);
+            g.Apply(types.T1, 1000);
+            g.Apply(types.T2, 1000);
+            
+            Assert.AreEqual(1110, g.GetAttributeValue(types.T0));
+            Assert.AreEqual(1111, g.GetAttributeValue(types.T1));
+            Assert.AreEqual(1112, g.GetAttributeValue(types.T2));
+            Assert.AreEqual(110, clone.GetAttributeValue(types.T0));
+            Assert.AreEqual(111, clone.GetAttributeValue(types.T1));
+            Assert.AreEqual(112, clone.GetAttributeValue(types.T2));
+
+            clone.Revert(g2);
+            
+            Assert.AreEqual(1110, g.GetAttributeValue(types.T0));
+            Assert.AreEqual(1111, g.GetAttributeValue(types.T1));
+            Assert.AreEqual(1112, g.GetAttributeValue(types.T2));
+            Assert.AreEqual(10, clone.GetAttributeValue(types.T0));
+            Assert.AreEqual(11, clone.GetAttributeValue(types.T1));
+            Assert.AreEqual(12, clone.GetAttributeValue(types.T2));
         }
 
         [Test]
