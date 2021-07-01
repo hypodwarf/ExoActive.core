@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 
 namespace Example_Effect
 {

@@ -5,41 +5,46 @@ using System.Runtime.Serialization;
 
 namespace ExoActive
 {
-    [DataContract]
-    public abstract partial class Entity
+    public static partial class Type<TKey, TValue>
     {
-        [DataMember] public readonly Guid guid = Guid.NewGuid();
-        [DataMember] protected readonly Dictionary<string, State> states = new();
-        [DataMember] protected readonly Attributes attributes = new();
-        [DataMember] protected readonly Traits traits = new();
-        
-        public Attributes Attributes => attributes;
-        public Traits Traits => traits;
-
-        public bool IsPermittedTrigger<S>(Enum trigger, CapabilityProcessData data) where S : State, new()
+        [DataContract]
+        public abstract partial class Entity
         {
-            return GetState<S>().GetPermittedTriggers(data).Contains(trigger);
-        }
+            [DataMember] public readonly Guid guid = Guid.NewGuid();
+            [DataMember] protected readonly Dictionary<string, EntityStateMachine> states = new();
+            [DataMember] protected readonly AttributeGroup attributes = new();
+            [DataMember] protected readonly Traits traits = new();
 
-        public void AddState(State state)
-        {
-            states.Add(state.Id, state);
-        }
+            public AttributeGroup Attributes => attributes;
+            public Traits Traits => traits;
 
-        public S GetState<S>() where S : State, new()
-        {
-            var stateId = StateHelper<S>.Id;
-            if (!states.TryGetValue(stateId, out var state))
+            public bool IsPermittedTrigger<TStateMachine>(Enum trigger, CapabilityProcessData data)
+                where TStateMachine : EntityStateMachine, new()
             {
-                state = StateHelper<S>.CreateState();
-                AddState(state);
+                return GetState<TStateMachine>().GetPermittedTriggers(data).Contains(trigger);
             }
-            return (S)state;
-        }
 
-        public bool HasState<S>() where S : State, new()
-        {
-            return states.ContainsKey(StateHelper<S>.Id);
+            public void AddState(EntityStateMachine state)
+            {
+                states.Add(state.Id, state);
+            }
+
+            public TStateMachine GetState<TStateMachine>() where TStateMachine : EntityStateMachine, new()
+            {
+                var stateId = StateHelper<TStateMachine>.Id;
+                if (!states.TryGetValue(stateId, out var state))
+                {
+                    state = StateHelper<TStateMachine>.CreateState();
+                    AddState(state);
+                }
+
+                return (TStateMachine) state;
+            }
+
+            public bool HasState<TStateMachine>() where TStateMachine : EntityStateMachine, new()
+            {
+                return states.ContainsKey(StateHelper<TStateMachine>.Id);
+            }
         }
     }
 }

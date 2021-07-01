@@ -1,5 +1,5 @@
 ﻿using System;
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 
 namespace Example_Equip
 {

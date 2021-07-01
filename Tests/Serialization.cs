@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 using JsonNetConverters;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -33,8 +33,8 @@ namespace Tests
         [Test]
         public void AttributesSerialization()
         {
-            var g1 = new Attributes();
-            var g2 = new Attributes();
+            var g1 = new AttributeGroup();
+            var g2 = new AttributeGroup();
 
             g1.Add(AttributeGroupTests.types.T0);
             g1.Add(AttributeGroupTests.types.T1, 1);
@@ -48,10 +48,10 @@ namespace Tests
 
             var jsonString = Serialize(g1);
             // Console.WriteLine(jsonString);
-            var dg1 = Deserialize<Attributes>(jsonString);
+            var dg1 = Deserialize<AttributeGroup>(jsonString);
 
-            Assert.True(Attributes.DefaultComparer.Equals(g1, dg1));
-            Assert.That(dg1, Is.EqualTo(g1).Using(Attributes.DefaultComparer));
+            Assert.True(AttributeGroup.DefaultComparer.Equals(g1, dg1));
+            Assert.That(dg1, Is.EqualTo(g1).Using(AttributeGroup.DefaultComparer));
         }
 
 
@@ -82,7 +82,7 @@ namespace Tests
 
             var dCup = Deserialize<Cup>(jsonString);
 
-            Assert.That(dCup, Is.EqualTo(cup).Using(State.DefaultComparer));
+            Assert.That(dCup, Is.EqualTo(cup).Using(EntityStateMachine.DefaultComparer));
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace Tests
         [Test]
         public void EntitySetSerialization()
         {
-            var attr = new Attributes();
+            var attr = new AttributeGroup();
             attr.Add(AttributeGroupTests.types.T0, 1, "T-Zero");
             
             var es = new EntitySet {{Guid.NewGuid(), attr}};

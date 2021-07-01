@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 
 namespace Example_GroupLift
 {
@@ -76,7 +76,7 @@ namespace Example_GroupLift
         }
 
         /** The state of an Entity that can be lifted off the ground **/
-        public class LiftedState : State
+        public class LiftedState : EntityStateMachine
         {
             private new enum State
             {
@@ -150,9 +150,9 @@ namespace Example_GroupLift
         }
 
         /** The state of an Entity that can attempt to lift other items **/
-        public class LiftingState : State
+        public class LiftingState : EntityStateMachine
         {
-            public new enum State
+            public enum State
             {
                 Empty,
                 Lifting,

@@ -1,119 +1,123 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 
 namespace ExoActive
 {
-    [DataContract]
-    public abstract class StateMachine<S, T> : Stateless.StateMachine<S, T> where S : Enum where T : Enum
+    public static partial class Type<TKey, TValue>
     {
         [DataContract]
-        protected class StateReference
+        public abstract class EnumStateMachine : Stateless.StateMachine<Enum, Enum>
         {
-            [DataMember] private S State;
-
-            public S get()
+            [DataContract]
+            protected class StateReference
             {
-                return State;
+                [DataMember] private Enum State;
+
+                public Enum get()
+                {
+                    return State;
+                }
+
+                public void set(Enum state)
+                {
+                    // Console.WriteLine(state);
+                    State = state;
+                }
+
+                public StateReference(Enum initialState)
+                {
+                    State = initialState;
+                }
             }
 
-            public void set(S state)
+            [DataMember] private StateReference stateRef;
+
+            public Enum CurrentState => State;
+
+            public delegate void Transitioned(Transition transInfo);
+
+            public new event Transitioned OnTransitionCompleted;
+
+            protected EnumStateMachine(StateReference stateRef) : base(stateRef.get, stateRef.set)
             {
-                // Console.WriteLine(state);
-                State = state;
+                this.stateRef = stateRef;
+
+                base.OnTransitionCompleted(t => OnTransitionCompleted?.Invoke(t));
+            }
+        }
+
+        [DataContract]
+        public abstract partial class EntityStateMachine : EnumStateMachine
+        {
+            private static readonly Dictionary<Enum, TriggerWithParameters<CapabilityProcessData>>
+                Triggers = new();
+
+            protected static TriggerWithParameters<CapabilityProcessData> GetTrigger(Enum trigger)
+            {
+                if (!Triggers.TryGetValue(trigger, out var dataTrigger))
+                {
+                    dataTrigger = new TriggerWithParameters<CapabilityProcessData>(trigger);
+                    Triggers[trigger] = dataTrigger;
+                }
+
+                return dataTrigger;
             }
 
-            public StateReference(S initialState)
+            public string Id => StateHelper.Id(this);
+
+            [DataMember] public EntitySet Entities { get; private init; }
+
+            [DataMember] public ulong LastTransitionTick { get; private set; }
+
+            protected virtual void OnTickEvent()
             {
-                State = initialState;
+            }
+
+            private void TransitionHandler(Transition transInfo)
+            {
+                LastTransitionTick = TimeTicker.Ticks;
+            }
+
+            protected EntityStateMachine(Enum initialState) : base(new StateReference(initialState))
+            {
+                OnTransitionCompleted += TransitionHandler;
+                TimeTicker.TickEvent += OnTickEvent;
+                Entities = new EntitySet();
+            }
+
+            public void Fire(Enum trigger, CapabilityProcessData data)
+            {
+                base.Fire(GetTrigger(trigger), data);
+            }
+
+            public override string ToString()
+            {
+                return $"{base.ToString()}, LastTick = {LastTransitionTick}, EntitiesCount = {Entities.Count}";
             }
         }
 
-        [DataMember] private StateReference stateRef;
-
-        public S CurrentState => State;
-
-        public delegate void Transitioned(Transition transInfo);
-
-        public new event Transitioned OnTransitionCompleted;
-
-        protected StateMachine(StateReference stateRef) : base(stateRef.get, stateRef.set)
+        public static class StateHelper<TStateMachine> where TStateMachine : EnumStateMachine, new()
         {
-            this.stateRef = stateRef;
+            public static string Id => StateHelper.Id(typeof(TStateMachine));
 
-            base.OnTransitionCompleted(t => OnTransitionCompleted?.Invoke(t));
-        }
-    }
-
-    [DataContract]
-    public abstract partial class State : StateMachine<Enum, Enum>
-    {
-        private static readonly Dictionary<Enum, TriggerWithParameters<CapabilityProcessData>> Triggers = new();
-
-        protected static TriggerWithParameters<CapabilityProcessData> GetTrigger(Enum trigger)
-        {
-            if (!Triggers.TryGetValue(trigger, out var dataTrigger))
+            public static TStateMachine CreateState()
             {
-                dataTrigger = new TriggerWithParameters<CapabilityProcessData>(trigger);
-                Triggers[trigger] = dataTrigger;
+                return new();
             }
-            return dataTrigger;
         }
 
-        public string Id => StateHelper.Id(this);
-        
-        [DataMember] public EntitySet Entities { get; private init; }
-
-        [DataMember] public ulong LastTransitionTick { get; private set; }
-
-        protected virtual void OnTickEvent()
+        public static class StateHelper
         {
-        }
+            internal static string Id(Type stateType)
+            {
+                return stateType.AssemblyQualifiedName;
+            }
 
-        private void TransitionHandler(Transition transInfo)
-        {
-            LastTransitionTick = TimeTicker.Ticks;
-        }
-
-        protected State(Enum initialState) : base(new StateReference(initialState))
-        {
-            OnTransitionCompleted += TransitionHandler;
-            TimeTicker.TickEvent += OnTickEvent;
-            Entities = new EntitySet();
-        }
-
-        public void Fire(Enum trigger, CapabilityProcessData data)
-        {
-            base.Fire(GetTrigger(trigger), data);
-        }
-
-        public override string ToString()
-        {
-            return $"{base.ToString()}, LastTick = {LastTransitionTick}, EntitiesCount = {Entities.Count}";
-        }
-    }
-
-    public static class StateHelper<S> where S : State, new()
-    {
-        public static string Id => StateHelper.Id(typeof(S));
-
-        public static S CreateState()
-        {
-            return new();
-        }
-    }
-
-    public static class StateHelper
-    {
-        internal static string Id(Type stateType)
-        {
-            return stateType.AssemblyQualifiedName;
-        }
-
-        public static string Id(State state)
-        {
-            return Id(state.GetType());
+            public static string Id(EnumStateMachine state)
+            {
+                return Id(state.GetType());
+            }
         }
     }
 }

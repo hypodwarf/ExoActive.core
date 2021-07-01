@@ -3,17 +3,20 @@ using System.Runtime.Serialization;
 
 namespace ExoActive
 {
-    [DataContract]
-    public static class TimeTicker
+    public static partial class Type<TKey, TValue>
     {
-        public static event Action TickEvent;
-
-        [DataMember] public static ulong Ticks { get; private set; }
-
-        public static void AddTicks(ulong tick)
+        [DataContract]
+        public static class TimeTicker
         {
-            Ticks += tick;
-            TickEvent?.Invoke();
+            public static event Action TickEvent;
+
+            [DataMember] public static ulong Ticks { get; private set; }
+
+            public static void AddTicks(ulong tick)
+            {
+                Ticks += tick;
+                TickEvent?.Invoke();
+            }
         }
     }
 }

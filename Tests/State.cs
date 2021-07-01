@@ -1,10 +1,9 @@
-using System;
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 using NUnit.Framework;
 
 namespace Tests
 {
-    public class Cup : State
+    public class Cup : EntityStateMachine
     {
         public new enum State
         {
@@ -45,7 +44,7 @@ namespace Tests
         }
     }
 
-    public class DynamicCup : State
+    public class DynamicCup : EntityStateMachine
     {
         public enum State
         {

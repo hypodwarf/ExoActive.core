@@ -1,4 +1,4 @@
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 using NUnit.Framework;
 
 namespace Tests
@@ -50,7 +50,7 @@ namespace Tests
             Assert.False(lowStrength(entity));
             Assert.True(goodStrength(entity));
 
-            var attrMods = new Attributes();
+            var attrMods = new AttributeGroup();
             attrMods.Add(TestEntity.EntityAttributes.Strength, -5);
 
             entity.Attributes.Apply(attrMods);

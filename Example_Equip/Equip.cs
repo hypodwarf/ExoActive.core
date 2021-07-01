@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 
 namespace Example_Equip
 {
@@ -36,7 +36,7 @@ namespace Example_Equip
             }
         }
 
-        public class EquipmentState : State
+        public class EquipmentState : EntityStateMachine
         {
             public enum State
             {
@@ -56,7 +56,7 @@ namespace Example_Equip
                     {
                         data.targets.ForEach(target =>
                         {
-                            var attributes = (Attributes)target.Attributes.Clone();
+                            var attributes = (AttributeGroup)target.Attributes.Clone();
                             attributes.Add(target.Traits.Value<EquipmentTraits>() | EquipmentTraits.Equip, -1);
                             Entities.Add(target, attributes);
                             data.subject.Attributes.Apply(attributes);
@@ -84,7 +84,7 @@ namespace Example_Equip
             }
         }
 
-        public class ItemEquippedState : State
+        public class ItemEquippedState : EntityStateMachine
         {
             public enum State
             {

@@ -1,5 +1,5 @@
 ﻿using System;
-using ExoActive;
+using static ExoActive.Type<System.Enum, int>;
 
 namespace Example_GroupLift
 {
@@ -16,7 +16,7 @@ namespace Example_GroupLift
             //
             // actors[2].Attributes.Apply(strengthAttr);
             
-            var weightAttr = new Attributes();
+            var weightAttr = new AttributeGroup();
             weightAttr.Add(PhysicalAttributes.Weight, 40);
 
             item1.Attributes.Apply(weightAttr);
