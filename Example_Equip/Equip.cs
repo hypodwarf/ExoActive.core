@@ -56,7 +56,7 @@ namespace Example_Equip
                     {
                         data.targets.ForEach(target =>
                         {
-                            var attributes = (AttributeGroup)target.Attributes.Clone();
+                            var attributes = (Attributes)target.Attributes.Clone();
                             attributes.Add(target.Traits.Value<EquipmentTraits>() | EquipmentTraits.Equip, -1);
                             Entities.Add(target, attributes);
                             data.subject.Attributes.Apply(attributes);

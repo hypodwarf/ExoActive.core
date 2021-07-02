@@ -12,10 +12,10 @@ namespace ExoActive
         {
             [DataMember] public readonly Guid guid = Guid.NewGuid();
             [DataMember] protected readonly Dictionary<string, EntityStateMachine> states = new();
-            [DataMember] protected readonly AttributeGroup attributes = new();
+            [DataMember] protected readonly Attributes attributes = new();
             [DataMember] protected readonly Traits traits = new();
 
-            public AttributeGroup Attributes => attributes;
+            public Attributes Attributes => attributes;
             public Traits Traits => traits;
 
             public bool IsPermittedTrigger<TStateMachine>(Enum trigger, CapabilityProcessData data)

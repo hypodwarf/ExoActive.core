@@ -36,11 +36,11 @@ namespace ExoActive
             }
         }
 
-        public class EntitySet : Dictionary<Guid, AttributeGroup>
+        public class EntitySet : Dictionary<Guid, Attributes>
         {
             public bool Add(Entity entity, params TKey[] types)
             {
-                var attributes = new AttributeGroup();
+                var attributes = new Attributes();
                 foreach (var type in types)
                 {
                     attributes.Add(type);
@@ -49,7 +49,7 @@ namespace ExoActive
                 return Add(entity, attributes);
             }
 
-            public bool Add(Entity entity, AttributeGroup attributes)
+            public bool Add(Entity entity, Attributes attributes)
             {
                 return TryAdd(entity?.guid ?? Guid.Empty, attributes);
             }
@@ -58,7 +58,7 @@ namespace ExoActive
 
             public bool Contains(Entity entity) => Keys.Contains(entity?.guid ?? Guid.Empty);
 
-            public AttributeGroup this[Entity entity]
+            public Attributes this[Entity entity]
             {
                 get => base[entity?.guid ?? Guid.Empty];
                 set => base[entity?.guid ?? Guid.Empty] = value;

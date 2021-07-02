@@ -16,7 +16,7 @@ namespace Example_GroupLift
             //
             // actors[2].Attributes.Apply(strengthAttr);
             
-            var weightAttr = new AttributeGroup();
+            var weightAttr = new Attributes();
             weightAttr.Add(PhysicalAttributes.Weight, 40);
 
             item1.Attributes.Apply(weightAttr);

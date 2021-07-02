@@ -6,11 +6,11 @@ namespace ExoActive
 {
     public static partial class Type<TKey, TValue>
     {
-        public struct CapabilityProcessData
+        public readonly struct CapabilityProcessData
         {
-            public Entity subject;
-            public List<Entity> actors;
-            public List<Entity> targets;
+            public readonly Entity subject;
+            public readonly List<Entity> actors;
+            public readonly List<Entity> targets;
 
             public CapabilityProcessData(Entity subject, List<Entity> actors,
                 List<Entity> targets)
@@ -93,10 +93,10 @@ namespace ExoActive
         }
 
         /**
-     * The CapabilityTriggerProcess runs as part of a Capaability. It is explicitly associated with a State and a Trigger.
-     * The State is added to the subject Entity if it not already available.
-     * The trigger requirement is added by default.
-     */
+         * The CapabilityTriggerProcess runs as part of a Capaability. It is explicitly associated with a State and a Trigger.
+         * The State is added to the subject Entity if it not already available.
+         * The trigger requirement is added by default.
+         */
         public class CapabilityTriggerProcess<TStateMachine> : ICapabilityProcess
             where TStateMachine : EntityStateMachine, new()
         {

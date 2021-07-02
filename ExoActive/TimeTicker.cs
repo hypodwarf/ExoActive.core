@@ -10,6 +10,7 @@ namespace ExoActive
         {
             public static event Action TickEvent;
 
+            // ReSharper disable once StaticMemberInGenericType
             [DataMember] public static ulong Ticks { get; private set; }
 
             public static void AddTicks(ulong tick)

@@ -135,9 +135,9 @@ namespace ExoActive
             }
         }
 
-        public partial class AttributeGroup
+        public partial class Attributes
         {
-            protected bool Equals(AttributeGroup other)
+            protected bool Equals(Attributes other)
             {
                 return DefaultComparer.Equals(this, other);
             }
@@ -147,7 +147,7 @@ namespace ExoActive
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((AttributeGroup) obj);
+                return Equals((Attributes) obj);
             }
 
             public override int GetHashCode()
@@ -155,9 +155,9 @@ namespace ExoActive
                 return DefaultComparer.GetHashCode(this);
             }
 
-            private sealed class DefaultEqualityComparer : IEqualityComparer<AttributeGroup>
+            private sealed class DefaultEqualityComparer : IEqualityComparer<Attributes>
             {
-                public bool Equals(AttributeGroup x, AttributeGroup y)
+                public bool Equals(Attributes x, Attributes y)
                 {
                     if (ReferenceEquals(x, y)) return true;
                     if (ReferenceEquals(x, null)) return false;
@@ -166,13 +166,13 @@ namespace ExoActive
                     return x.SequenceEqual(y);
                 }
 
-                public int GetHashCode(AttributeGroup obj)
+                public int GetHashCode(Attributes obj)
                 {
                     return obj.GetHashCode();
                 }
             }
 
-            public static IEqualityComparer<AttributeGroup> DefaultComparer { get; } =
+            public static IEqualityComparer<Attributes> DefaultComparer { get; } =
                 new DefaultEqualityComparer();
         }
 
@@ -208,7 +208,7 @@ namespace ExoActive
                            && x.states.Keys.SequenceEqual(y.states.Keys)
                            && x.states.Values.SequenceEqual<EntityStateMachine>(y.states.Values,
                                EntityStateMachine.DefaultComparer)
-                           && AttributeGroup.DefaultComparer.Equals(x.attributes, y.attributes)
+                           && Attributes.DefaultComparer.Equals(x.attributes, y.attributes)
                            && Traits.DefaultComparer.Equals(x.traits, y.traits);
                 }
 

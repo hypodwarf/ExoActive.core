@@ -8,21 +8,21 @@ namespace ExoActive
     public static partial class Type<TKey, TValue>
     {
         [DataContract]
-        public partial class AttributeGroup : Dictionary<TKey, Attribute>, ICloneable
+        public partial class Attributes : Dictionary<TKey, Attribute>, ICloneable
         {
             private delegate Attribute AttributeAction(Attribute a, Attribute b);
 
-            public AttributeGroup()
+            public Attributes()
             {
             }
 
-            protected AttributeGroup(AttributeGroup copy) : base(copy)
+            protected Attributes(Attributes copy) : base(copy)
             {
             }
 
             public virtual object Clone()
             {
-                return new AttributeGroup(this);
+                return new Attributes(this);
             }
 
             public void Add(TKey type, TValue value = default, string name = null)
@@ -47,10 +47,10 @@ namespace ExoActive
                 return base[type].modifiedValue.value;
             }
 
-            private List<TKey> PerformActionOnGroup(AttributeGroup attributeGroup, AttributeAction action)
+            private List<TKey> PerformActionOnGroup(Attributes attributes, AttributeAction action)
             {
                 var failed = new List<TKey>();
-                foreach (var (type, attribute) in attributeGroup)
+                foreach (var (type, attribute) in attributes)
                     if (ContainsKey(type))
                         base[type] = action(base[type], attribute);
                     else
@@ -60,18 +60,18 @@ namespace ExoActive
                 return failed;
             }
 
-            public List<TKey> Apply(AttributeGroup attributeGroup)
+            public List<TKey> Apply(Attributes attributes)
             {
-                return PerformActionOnGroup(attributeGroup, (a, b) => a.UpsertModifier(b));
+                return PerformActionOnGroup(attributes, (a, b) => a.UpsertModifier(b));
             }
 
-            // public List<TKey> AddApply(AttributeGroup attributeGroup)
+            // public List<TKey> AddApply(Attributes attributes)
             // {
-            //     foreach (var (type, attribute) in attributeGroup)
+            //     foreach (var (type, attribute) in attributes)
             //     {
             //         if (ContainsKey(type))
             //         {
-            //             PerformActionOnGroup(attributeGroup, (a, b) => a.UpsertModifier(b));
+            //             PerformActionOnGroup(attributes, (a, b) => a.UpsertModifier(b));
             //         }
             //         else
             //         {
@@ -82,9 +82,9 @@ namespace ExoActive
             //     return new List<TKey>();
             // }
 
-            public List<TKey> Revert(AttributeGroup attributeGroup)
+            public List<TKey> Revert(Attributes attributes)
             {
-                return PerformActionOnGroup(attributeGroup, (a, b) => a.RemoveModifier(b));
+                return PerformActionOnGroup(attributes, (a, b) => a.RemoveModifier(b));
             }
 
             public void Reset()

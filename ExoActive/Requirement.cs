@@ -38,20 +38,20 @@ namespace ExoActive
         {
             public delegate bool Evaluate(TValue value, TValue threshold);
 
-            private readonly TKey Attribute;
-            private readonly TValue Threshold;
-            private readonly Evaluate Evaluation;
+            private readonly TKey attribute;
+            private readonly TValue threshold;
+            private readonly Evaluate evaluation;
 
             private AttributeRequirement(TKey attribute, TValue threshold, Evaluate evaluation)
             {
-                Attribute = attribute;
-                Threshold = threshold;
-                Evaluation = evaluation;
+                this.attribute = attribute;
+                this.threshold = threshold;
+                this.evaluation = evaluation;
             }
 
             public bool Passes(Entity entity, CapabilityProcessData data)
             {
-                return Evaluation(entity.Attributes.GetAttributeValue(Attribute), Threshold);
+                return evaluation(entity.Attributes.GetAttributeValue(attribute), threshold);
             }
 
             public static IRequirement.Check Create(TKey attribute, TValue threshold, Evaluate evaluation)

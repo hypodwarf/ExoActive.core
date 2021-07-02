@@ -33,8 +33,8 @@ namespace Tests
         [Test]
         public void AttributesSerialization()
         {
-            var g1 = new AttributeGroup();
-            var g2 = new AttributeGroup();
+            var g1 = new Attributes();
+            var g2 = new Attributes();
 
             g1.Add(AttributeGroupTests.types.T0);
             g1.Add(AttributeGroupTests.types.T1, 1);
@@ -48,10 +48,10 @@ namespace Tests
 
             var jsonString = Serialize(g1);
             // Console.WriteLine(jsonString);
-            var dg1 = Deserialize<AttributeGroup>(jsonString);
+            var dg1 = Deserialize<Attributes>(jsonString);
 
-            Assert.True(AttributeGroup.DefaultComparer.Equals(g1, dg1));
-            Assert.That(dg1, Is.EqualTo(g1).Using(AttributeGroup.DefaultComparer));
+            Assert.True(Attributes.DefaultComparer.Equals(g1, dg1));
+            Assert.That(dg1, Is.EqualTo(g1).Using(Attributes.DefaultComparer));
         }
 
 
@@ -127,7 +127,7 @@ namespace Tests
         [Test]
         public void EntitySetSerialization()
         {
-            var attr = new AttributeGroup();
+            var attr = new Attributes();
             attr.Add(AttributeGroupTests.types.T0, 1, "T-Zero");
             
             var es = new EntitySet {{Guid.NewGuid(), attr}};
