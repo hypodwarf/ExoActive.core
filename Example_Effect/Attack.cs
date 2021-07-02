@@ -1,8 +1,4 @@
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
 using static ExoActive.Type<System.Enum, int>;
 
 namespace Example_Effect
@@ -11,6 +7,7 @@ namespace Example_Effect
     {
         private class ReduceHealth : ICapabilityProcess
         {
+            private const string DAMAGE = "Damage";
             public bool PassesRequirements(CapabilityProcessData data)
             {
                 return data.subject.Attributes.Has(HealthAttributes.Health) &&
@@ -19,9 +16,10 @@ namespace Example_Effect
 
             public void PerformAction(CapabilityProcessData data)
             {
-                data.subject.Attributes.Apply(HealthAttributes.Health,
-                    data.actors.Aggregate(0,
-                        (power, actor) => power - actor.Attributes.GetAttributeValue(WeaponAttributes.Power)));
+                var damageDone = data.actors.Aggregate(0,
+                    (power, actor) => power + actor.Attributes.GetAttributeValue(WeaponAttributes.Power));
+
+                data.subject.Attributes.AdjustNamedModifier(HealthAttributes.Health, DAMAGE, -damageDone);
             }
         }
         

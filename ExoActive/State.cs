@@ -33,7 +33,7 @@ namespace ExoActive
 
             [DataMember] private StateReference stateRef;
 
-            public Enum CurrentState => State;
+            public Enum CurrentState => base.State;
 
             public delegate void Transitioned(Transition transInfo);
 

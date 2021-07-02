@@ -16,13 +16,17 @@ namespace Example_Effect
             foreach (var actor in team1)
             {
                 Console.WriteLine($"Health: {actor.Attributes.GetAttributeValue(HealthAttributes.Health)}");
+                AttributeHelper.PrintAttributeTree(actor.Attributes[HealthAttributes.Health]);
             }
             Console.WriteLine("--- Team 2 ---");
             foreach (var actor in team2)
             {
                 Console.WriteLine($"Health: {actor.Attributes.GetAttributeValue(HealthAttributes.Health)}");
+                AttributeHelper.PrintAttributeTree(actor.Attributes[HealthAttributes.Health]);
             }
 
+            Capability.Get<Attack>().PerformAction(team1.ToList(), team2.ToList());
+            Capability.Get<Attack>().PerformAction(team1.ToList(), team2.ToList());
             Capability.Get<Attack>().PerformAction(team1.ToList(), team2.ToList());
             Capability.Get<Heal>().PerformAction(team2.ToList(), team2.ToList());
             
@@ -30,11 +34,13 @@ namespace Example_Effect
             foreach (var actor in team1)
             {
                 Console.WriteLine($"Health: {actor.Attributes.GetAttributeValue(HealthAttributes.Health)}");
+                AttributeHelper.PrintAttributeTree(actor.Attributes[HealthAttributes.Health]);
             }
             Console.WriteLine("--- Team 2 ---");
             foreach (var actor in team2)
             {
                 Console.WriteLine($"Health: {actor.Attributes.GetAttributeValue(HealthAttributes.Health)}");
+                AttributeHelper.PrintAttributeTree(actor.Attributes[HealthAttributes.Health]);
             }
         }
     }

@@ -37,6 +37,20 @@ namespace ExoActive
                 attribute.guid, attribute.version + 1)
             {
             }
+            
+            private Attribute(Attribute attribute, TValue value, Attribute[] modifiers) : this(
+                new NamedValue(attribute.namedValue.name,value),
+                modifiers,
+                attribute.guid, attribute.version + 1)
+            {
+            }
+            
+            private Attribute(Attribute attribute, NamedValue namedValue, Attribute[] modifiers) : this(
+                namedValue,
+                modifiers,
+                attribute.guid, attribute.version + 1)
+            {
+            }
 
             private Attribute(NamedValue namedValue, Attribute[] modifiers, Guid guid, ulong version)
             {
@@ -56,6 +70,11 @@ namespace ExoActive
                         return i;
 
                 return -1;
+            }
+
+            public Attribute AdjustBaseValue(TValue value)
+            {
+                return new(this, this.namedValue + value, this.modifiers);
             }
 
             private Attribute InsertModifierAtEnd(Attribute modifier)
@@ -114,7 +133,22 @@ namespace ExoActive
 
             public Attribute Reset() => new(this, Array.Empty<Attribute>());
 
+            public Attribute Flatten() => new(this, this.modifiedValue.value, Array.Empty<Attribute>());
+
             public ReadOnlyCollection<Attribute> Modifiers => new(modifiers);
+
+            public Attribute GetModifierByName(string name)
+            {
+                try
+                {
+                    return modifiers.First(attribute => attribute.namedValue.name.Equals(name));
+                }
+                catch (InvalidOperationException)
+                {
+                    var attr =  new Attribute(name, default);
+                    return attr;
+                }
+            }
         }
 
         public readonly struct AttributeHelper

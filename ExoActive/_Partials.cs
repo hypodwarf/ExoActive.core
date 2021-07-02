@@ -41,6 +41,22 @@ namespace ExoActive
 
         public readonly partial struct NamedValue : IEquatable<NamedValue>
         {
+            public static NamedValue operator +(NamedValue lv, TValue rv)
+            {
+                TValue value;
+                try
+                {
+                    value = (dynamic) lv.value + rv;
+                }
+                catch (RuntimeBinderException e)
+                {
+                    Console.Error.WriteLine(e.ToString());
+                    // The values cannot be added, so the value from lv is used.
+                    value = lv.value;
+                }
+                
+                return new NamedValue(lv.name, value);
+            }
             public static NamedValue operator +(NamedValue lv, NamedValue rv)
             {
                 TValue value;

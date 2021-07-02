@@ -7,6 +7,7 @@ namespace Example_Effect
     {
         private class ImproveHealth : ICapabilityProcess
         {
+            private const string HEALING = "Healing";
             public bool PassesRequirements(CapabilityProcessData data)
             {
                 return data.subject.Attributes.Has(WeaponAttributes.Power)
@@ -16,7 +17,7 @@ namespace Example_Effect
             public void PerformAction(CapabilityProcessData data)
             {
                 var power = data.subject.Attributes.GetAttributeValue(WeaponAttributes.Power);
-                data.targets.ForEach(target => target.Attributes.Apply(HealthAttributes.Health, power));
+                data.targets.ForEach(target => target.Attributes.AdjustNamedModifier(HealthAttributes.Health, HEALING, power));
             }
         }
 

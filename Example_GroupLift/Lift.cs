@@ -152,7 +152,7 @@ namespace Example_GroupLift
         /** The state of an Entity that can attempt to lift other items **/
         public class LiftingState : EntityStateMachine
         {
-            public enum State
+            public new enum State
             {
                 Empty,
                 Lifting,

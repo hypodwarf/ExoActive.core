@@ -38,7 +38,7 @@ namespace Example_Equip
 
         public class EquipmentState : EntityStateMachine
         {
-            public enum State
+            public new enum State
             {
                 Equipment
             }
@@ -86,7 +86,7 @@ namespace Example_Equip
 
         public class ItemEquippedState : EntityStateMachine
         {
-            public enum State
+            public new enum State
             {
                 IsEquipped,
                 NotEquipped

@@ -46,7 +46,7 @@ namespace Tests
 
     public class DynamicCup : EntityStateMachine
     {
-        public enum State
+        public new enum State
         {
             Empty,
             HalfFull,

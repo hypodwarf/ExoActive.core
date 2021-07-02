@@ -32,11 +32,26 @@ namespace ExoActive
 
             public bool Apply(TKey type, TValue value = default, string name = null)
             {
+                return Apply(type, new Attribute(name ?? type.ToString(), value));
+            }
+            
+            public bool Apply(TKey type, Attribute attribute)
+            {
                 if (!ContainsKey(type)) return false;
-                base[type] = base[type].UpsertModifier(new Attribute(name ?? type.ToString(), value));
+                base[type] = base[type].UpsertModifier(attribute);
                 return true;
             }
 
+            public bool AdjustNamedModifier(TKey type, string name, TValue adjustment)
+            {
+                return Apply(type, base[type].GetModifierByName(name).AdjustBaseValue(adjustment));
+            }
+            
+            public List<TKey> Apply(Attributes attributes)
+            {
+                return PerformActionOnGroup(attributes, (a, b) => a.UpsertModifier(b));
+            }
+            
             public bool Has(TKey type)
             {
                 return ContainsKey(type);
@@ -58,11 +73,6 @@ namespace ExoActive
 
                 // Console.WriteLine($"Attributes action failed for {failed.Aggregate("", (a, i) => a + " " + i)}");
                 return failed;
-            }
-
-            public List<TKey> Apply(Attributes attributes)
-            {
-                return PerformActionOnGroup(attributes, (a, b) => a.UpsertModifier(b));
             }
 
             // public List<TKey> AddApply(Attributes attributes)
