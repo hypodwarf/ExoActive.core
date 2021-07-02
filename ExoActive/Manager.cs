@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ExoActive
 {
-    public static partial class Type<TKey, TValue>
+    public partial class ExoActive<TKey, TValue>
     {
         public static class Manager
         {

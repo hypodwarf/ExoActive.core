@@ -1,5 +1,5 @@
 using System.Linq;
-using static ExoActive.Type<System.Enum, int>;
+using static ExoActive.ExoActive<System.Enum, long>;
 
 namespace Example_Effect
 {
@@ -16,7 +16,7 @@ namespace Example_Effect
 
             public void PerformAction(CapabilityProcessData data)
             {
-                var damageDone = data.actors.Aggregate(0,
+                var damageDone = data.actors.Aggregate(0l,
                     (power, actor) => power + actor.Attributes.GetAttributeValue(WeaponAttributes.Power));
 
                 data.subject.Attributes.AdjustNamedModifier(HealthAttributes.Health, DAMAGE, -damageDone);

@@ -5,7 +5,7 @@ using Microsoft.CSharp.RuntimeBinder;
 
 namespace ExoActive
 {
-    public static partial class Type<TKey, TValue>
+    public partial class ExoActive<TKey, TValue>
     {
         public readonly partial struct Attribute : IEquatable<Attribute>
         {

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace ExoActive
 {
-    public static partial class Type<TKey, TValue>
+    public partial class ExoActive<TKey, TValue>
     {
         [DataContract]
         public abstract class EnumStateMachine : Stateless.StateMachine<Enum, Enum>

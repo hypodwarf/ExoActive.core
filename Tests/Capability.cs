@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using static ExoActive.Type<System.Enum, int>;
+using static ExoActive.ExoActive<System.Enum, int>;
 using NUnit.Framework;
 
 namespace Tests

@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace ExoActive
 {
-    public static partial class Type<TKey, TValue>
+    public partial class ExoActive<TKey, TValue>
     {
         [DataContract]
         public static class TimeTicker

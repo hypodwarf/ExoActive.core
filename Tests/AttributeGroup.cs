@@ -16,8 +16,8 @@ namespace Tests
         [Test]
         public void CanCreate()
         {
-            var g1 = new Type<string, int>.Attributes();
-            var g2 = new Type<types, string>.Attributes();
+            var g1 = new ExoActive<string, int>.Attributes();
+            var g2 = new ExoActive<types, string>.Attributes();
 
             Assert.Pass();
         }
@@ -25,7 +25,7 @@ namespace Tests
         [Test]
         public void CanManageAttributes()
         {
-            var g = new Type<types, int>.Attributes();
+            var g = new ExoActive<types, int>.Attributes();
 
             Assert.False(g.Has(types.T0));
 
@@ -45,8 +45,8 @@ namespace Tests
         [Test]
         public void CanModifyAttributes()
         {
-            var g1 = new Type<types, int>.Attributes();
-            var g2 = new Type<types, int>.Attributes();
+            var g1 = new ExoActive<types, int>.Attributes();
+            var g2 = new ExoActive<types, int>.Attributes();
 
             g1.Add(types.T0);
             g1.Add(types.T1, 1);
@@ -78,8 +78,8 @@ namespace Tests
         [Test]
         public void ReportMissingAttributes()
         {
-            var g1 = new Type<types, int>.Attributes();
-            var g2 = new Type<types, int>.Attributes();
+            var g1 = new ExoActive<types, int>.Attributes();
+            var g2 = new ExoActive<types, int>.Attributes();
 
             g1.Add(types.T0);
             g1.Add(types.T1, 1);
@@ -102,7 +102,7 @@ namespace Tests
         [Test]
         public void CanResetType()
         {
-            var g = new Type<types, int>.Attributes();
+            var g = new ExoActive<types, int>.Attributes();
             g.Add(types.T0, 10);
             g.Add(types.T1, 11);
             g.Add(types.T2, 12, "Tootsie");
@@ -131,8 +131,8 @@ namespace Tests
         [Test]
         public void CanClone()
         {
-            var g = new Type<types, int>.Attributes {{types.T0, 10}, {types.T1, 11}, {types.T2, 12, "Tootsie"}};
-            var g2 = new Type<types, int>.Attributes {{types.T0, 100}, {types.T1, 100}, {types.T2, 100, "Thrice"}};
+            var g = new ExoActive<types, int>.Attributes {{types.T0, 10}, {types.T1, 11}, {types.T2, 12, "Tootsie"}};
+            var g2 = new ExoActive<types, int>.Attributes {{types.T0, 100}, {types.T1, 100}, {types.T2, 100, "Thrice"}};
 
             g.Apply(g2);
             
@@ -140,7 +140,7 @@ namespace Tests
             Assert.AreEqual(111, g.GetAttributeValue(types.T1));
             Assert.AreEqual(112, g.GetAttributeValue(types.T2));
 
-            var clone = (Type<types, int>.Attributes)g.Clone();
+            var clone = (ExoActive<types, int>.Attributes)g.Clone();
             
             Assert.AreEqual(110, clone.GetAttributeValue(types.T0));
             Assert.AreEqual(111, clone.GetAttributeValue(types.T1));
@@ -170,8 +170,8 @@ namespace Tests
         [Test]
         public void CanAddCircularModifications()
         {
-            var g1 = new Type<types, int>.Attributes();
-            var g2 = new Type<types, int>.Attributes();
+            var g1 = new ExoActive<types, int>.Attributes();
+            var g2 = new ExoActive<types, int>.Attributes();
 
             g1.Add(types.T0);
             g1.Add(types.T1, 1);
@@ -197,8 +197,8 @@ namespace Tests
             Assert.AreEqual(1, g1.GetAttributeValue(types.T1));
             Assert.AreEqual(2, g1.GetAttributeValue(types.T2));
 
-            g1 = new Type<types, int>.Attributes();
-            g2 = new Type<types, int>.Attributes();
+            g1 = new ExoActive<types, int>.Attributes();
+            g2 = new ExoActive<types, int>.Attributes();
 
             g1.Add(types.T0);
             g1.Add(types.T1, 1);

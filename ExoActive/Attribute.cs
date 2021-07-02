@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace ExoActive
 {
-    public static partial class Type<TKey, TValue>
+    public partial class ExoActive<TKey, TValue>
     {
         /**
      * The Attribute struct starts with a base value from a NamedValue object. Each Attribute is given a GUID upon
