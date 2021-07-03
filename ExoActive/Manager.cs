@@ -5,77 +5,83 @@ using System.Linq;
 
 namespace ExoActive
 {
-    public partial class ExoActive<TKey, TValue>
+    public static class Manager
     {
-        public static class Manager
+        private static Dictionary<Guid, Entity> entities =
+            new Dictionary<Guid, Entity>();
+
+        public static ReadOnlyDictionary<Guid, Entity> Entities
         {
-            private static Dictionary<Guid, Entity> entities =
-                new Dictionary<Guid, Entity>();
+            get => new ReadOnlyDictionary<Guid, Entity>(entities);
+            set => entities = new Dictionary<Guid, Entity>(value);
+        }
 
-            public static ReadOnlyDictionary<Guid, Entity> Entities
+        public static E New<E>() where E : Entity, new()
+        {
+            E entity = new E();
+            entities.Add(entity.Guid, entity);
+            return entity;
+        }
+
+        public static IEntity Get(Guid guid) => guid.Equals(Guid.Empty) ? null : entities[guid];
+
+        public class ManagedEntity : Entity
+        {
+            protected ManagedEntity()
             {
-                get => new ReadOnlyDictionary<Guid, Entity>(entities);
-                set => entities = new Dictionary<Guid, Entity>(value);
+                Manager.entities.Add(this.Guid, this);
+            }
+        }
+    }
+
+    public class EntitySet : Dictionary<Guid, Attributes>
+    {
+        public bool Add(IEntity entity, params System.Enum[] types)
+        {
+            var attributes = new Attributes();
+            foreach (var type in types)
+            {
+                attributes.Add(type);
             }
 
-            public static E New<E>() where E : Entity, new()
+            return Add(entity, attributes);
+        }
+
+        public bool Add(IEntity entity, Attributes attributes)
+        {
+            // return TryAdd(entity?.Guid ?? Guid.Empty, attributes);
+            try
             {
-                E entity = new E();
-                entities.Add(entity.guid, entity);
-                return entity;
+                base.Add(entity?.Guid ?? Guid.Empty, attributes);
+                return true;
             }
-
-            public static Entity Get(Guid guid) => guid.Equals(Guid.Empty) ? null : entities[guid];
-
-            public class ManagedEntity : Entity
+            catch (Exception)
             {
-                protected ManagedEntity()
-                {
-                    Manager.entities.Add(this.guid, this);
-                }
+                return false;
             }
         }
 
-        public class EntitySet : Dictionary<Guid, Attributes>
+        public bool Remove(IEntity entity) => Remove(entity?.Guid ?? Guid.Empty);
+
+        public bool Contains(IEntity entity) => Keys.Contains(entity?.Guid ?? Guid.Empty);
+
+        public Attributes this[IEntity entity]
         {
-            public bool Add(Entity entity, params TKey[] types)
-            {
-                var attributes = new Attributes();
-                foreach (var type in types)
-                {
-                    attributes.Add(type);
-                }
-
-                return Add(entity, attributes);
-            }
-
-            public bool Add(Entity entity, Attributes attributes)
-            {
-                return TryAdd(entity?.guid ?? Guid.Empty, attributes);
-            }
-
-            public bool Remove(Entity entity) => Remove(entity?.guid ?? Guid.Empty);
-
-            public bool Contains(Entity entity) => Keys.Contains(entity?.guid ?? Guid.Empty);
-
-            public Attributes this[Entity entity]
-            {
-                get => base[entity?.guid ?? Guid.Empty];
-                set => base[entity?.guid ?? Guid.Empty] = value;
-            }
-
-            public List<Entity> List
-            {
-                get => this.Aggregate(new List<Entity>(this.Count),
-                    (acc, kvp) =>
-                    {
-                        acc.Add(Manager.Get(kvp.Key));
-                        return acc;
-                    });
-            }
-
-            public override string ToString() =>
-                this.Aggregate("", (s, guid) => $"{(s.Length > 0 ? $"{s}, " : s)}{guid.Key}");
+            get => base[entity?.Guid ?? Guid.Empty];
+            set => base[entity?.Guid ?? Guid.Empty] = value;
         }
+
+        public List<IEntity> List
+        {
+            get => this.Aggregate(new List<IEntity>(this.Count),
+                (acc, kvp) =>
+                {
+                    acc.Add(Manager.Get(kvp.Key));
+                    return acc;
+                });
+        }
+
+        public override string ToString() =>
+            this.Aggregate("", (s, guid) => $"{(s.Length > 0 ? $"{s}, " : s)}{guid.Key}");
     }
 }

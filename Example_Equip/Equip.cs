@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 
 namespace Example_Equip
 {

@@ -1,4 +1,4 @@
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 using NUnit.Framework;
 
 namespace Tests
@@ -8,12 +8,12 @@ namespace Tests
         public static readonly IRequirement.Check CanFill = StateRequirement<Cup>.Create(Cup.Trigger.Fill);
         public static readonly IRequirement.Check CanDrink = StateRequirement<Cup>.Create(Cup.Trigger.Drink);
 
-        public bool GTE(int value, int threshold)
+        public bool GTE(long value, long threshold)
         {
             return value >= threshold;
         }
 
-        public bool LT(int value, int threshold)
+        public bool LT(long value, long threshold)
         {
             return value < threshold;
         }

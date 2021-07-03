@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 
 namespace Example_GroupLift
 {
@@ -20,7 +20,7 @@ namespace Example_GroupLift
      * This demonstrates the transfer or consumption of an attribute... strength is used to reduce weight. 
      */
         
-        internal static void DistributeTargetWeight(Entity target)
+        internal static void DistributeTargetWeight(IEntity target)
         {
             // Assumptions:
             // There is one and only one target.
@@ -45,9 +45,9 @@ namespace Example_GroupLift
             // We start by simply dividing the weight evenly. We apply the weight to each actor, up to their max, and 
             // keep track of the extra amout. We then repeat the process for the actors that aren't maxed out until
             // all the weight is distributed orall the actors are maxed out.
-            int remainingWeight;
+            long remainingWeight;
 
-            var actorQueue = new Queue<Entity>(currentActors.Where(actor =>
+            var actorQueue = new Queue<IEntity>(currentActors.Where(actor =>
                 actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength) > 0));
 
             while ((remainingWeight = target.Attributes.GetAttributeValue(PhysicalAttributes.Weight)) > 0 &&
@@ -69,13 +69,13 @@ namespace Example_GroupLift
                 //Refresh Queue
                 if (actorQueue.Count == 0)
                 {
-                    actorQueue = new Queue<Entity>(currentActors.Where(entity =>
+                    actorQueue = new Queue<IEntity>(currentActors.Where(entity =>
                         entity.Attributes.GetAttributeValue(PhysicalAttributes.Strength) > 0));
                 }
             }
         }
 
-        /** The state of an Entity that can be lifted off the ground **/
+        /** The state of an IEntity that can be lifted off the ground **/
         public class LiftedState : EntityStateMachine
         {
             private new enum State
@@ -107,7 +107,7 @@ namespace Example_GroupLift
 
             private Enum DynamicPickUp(CapabilityProcessData data)
             {
-                var combinedStrength = data.actors.Aggregate(0,
+                var combinedStrength = data.actors.Aggregate(0L,
                     (acc, actor) => acc + actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
 
                 var remainingWeight = data.subject.Attributes.GetAttributeValue(PhysicalAttributes.Weight);
@@ -119,11 +119,11 @@ namespace Example_GroupLift
             {
                 if (Entities.Count == data.actors.Count) return State.Released;
 
-                var returnedWeight = Entities.Where(entity => data.actors.ConvertAll(e => e.guid).Contains(entity.Key))
-                    .Aggregate(0,
+                var returnedWeight = Entities.Where(entity => data.actors.ConvertAll(e => e.Guid).Contains(entity.Key))
+                    .Aggregate(0L,
                         (acc, kvp) => acc + kvp.Value.GetAttributeValue(PhysicalAttributes.Weight));
 
-                var availableStrength = Entities.List.Where(entity => !data.actors.Contains(entity)).Aggregate(0,
+                var availableStrength = Entities.List.Where(entity => !data.actors.Contains(entity)).Aggregate(0L,
                     (acc, actor) => acc + actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
 
                 return availableStrength >= -returnedWeight ? State.Aloft : State.Grappled;
@@ -149,7 +149,7 @@ namespace Example_GroupLift
             }
         }
 
-        /** The state of an Entity that can attempt to lift other items **/
+        /** The state of an IEntity that can attempt to lift other items **/
         public class LiftingState : EntityStateMachine
         {
             public new enum State
@@ -217,9 +217,9 @@ namespace Example_GroupLift
             {
             }
 
-            protected override void AfterAction(List<Entity> actors, List<Entity> targets)
+            protected override void AfterAction(List<IEntity> actors, List<IEntity> targets)
             {
-                Console.WriteLine($"{actors.Count} Actors PICKUP Target [{targets[0].guid}]");
+                Console.WriteLine($"{actors.Count} Actors PICKUP Target [{targets[0].Guid}]");
                 DistributeTargetWeight(targets[0]);
             }
         }
@@ -248,9 +248,9 @@ namespace Example_GroupLift
             {
             }
             
-            protected override void AfterAction(List<Entity> actors, List<Entity> targets)
+            protected override void AfterAction(List<IEntity> actors, List<IEntity> targets)
             {
-                Console.WriteLine($"{actors.Count} Actors PUTDOWN Target [{targets[0].guid}]");
+                Console.WriteLine($"{actors.Count} Actors PUTDOWN Target [{targets[0].Guid}]");
                 DistributeTargetWeight(targets[0]);
             }
         }

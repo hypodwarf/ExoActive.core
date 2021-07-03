@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 using JsonNetConverters;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -95,12 +95,12 @@ namespace Tests
 
             // var dEntity = Deserialize<TestEntity>(jsonString);
 
-            // Assert.That(dEntity, Is.EqualTo(entity).Using(Entity.DefaultComparer));
+            // Assert.That(dEntity, Is.EqualTo(entity).Using(IEntity.DefaultComparer));
 
             var fill = Capability.Get<TestCapabilityFill>();
             var drink = Capability.Get<TestCapabilityDrink>();
 
-            fill.PerformAction(new List<Entity>() {entity});
+            fill.PerformAction(new List<IEntity>() {entity});
             jsonString = Serialize(entity);
 
             Console.WriteLine(jsonString);

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using static ExoActive.ExoActive<System.Enum, long>;
+using ExoActive;
 
 namespace Example_Effect
 {
@@ -8,8 +8,8 @@ namespace Example_Effect
     {
         static void Main(string[] args)
         {
-            Entity[] team1 = {new Actor(), new Actor(), new Actor()};
-            Entity[] team2 = {new Actor(), new Actor(), new Actor()};
+            IEntity[] team1 = {new Actor(), new Actor(), new Actor()};
+            IEntity[] team2 = {new Actor(), new Actor(), new Actor()};
             
             Console.WriteLine("Actors can damage or heal other actors based on their weapon power");
             Console.WriteLine("--- Team 1 ---");

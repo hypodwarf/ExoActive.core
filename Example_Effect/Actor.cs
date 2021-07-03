@@ -1,4 +1,4 @@
-using static ExoActive.ExoActive<System.Enum, long>;
+using ExoActive;
 
 namespace Example_Effect
 {

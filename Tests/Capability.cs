@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 using NUnit.Framework;
 
 namespace Tests
@@ -44,7 +44,7 @@ namespace Tests
         public void CanPerformAction()
         {
             var entity = new TestEntity();
-            var actors = new List<Entity> {entity};
+            var actors = new List<IEntity> {entity};
             var fill = Capability.Get<TestCapabilityFill>();
             var drink = Capability.Get<TestCapabilityDrink>();
 

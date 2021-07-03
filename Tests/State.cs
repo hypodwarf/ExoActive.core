@@ -1,4 +1,4 @@
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 using NUnit.Framework;
 
 namespace Tests

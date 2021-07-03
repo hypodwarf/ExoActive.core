@@ -1,5 +1,5 @@
 ﻿using System;
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 
 namespace Example_GroupLift
 {
@@ -7,9 +7,9 @@ namespace Example_GroupLift
     {
         private static void Main(string[] args)
         {
-            Entity[] actors = { new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor()};
-            Entity item1 = new Item();
-            Entity item2 = new Item();
+            IEntity[] actors = { new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor()};
+            IEntity item1 = new Item();
+            IEntity item2 = new Item();
             
             // var strengthAttr = new Attributes();
             // strengthAttr.Add(PhysicalAttributes.Strength, -6);
@@ -21,18 +21,18 @@ namespace Example_GroupLift
 
             item1.Attributes.Apply(weightAttr);
 
-            Array.ForEach(actors, actor => Console.WriteLine($"Actor {actor.guid} -> Strength: {actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength)} LiftingState: {actor.GetState<Lift.LiftingState>().CurrentState}"));
-            Console.WriteLine($"Item {item1.guid} -> Weight: {item1.Attributes.GetAttributeValue(PhysicalAttributes.Weight)} LiftedState: {item1.GetState<Lift.LiftedState>().CurrentState}");
+            Array.ForEach(actors, actor => Console.WriteLine($"Actor {actor.Guid} -> Strength: {actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength)} LiftingState: {actor.GetState<Lift.LiftingState>().CurrentState}"));
+            Console.WriteLine($"Item {item1.Guid} -> Weight: {item1.Attributes.GetAttributeValue(PhysicalAttributes.Weight)} LiftedState: {item1.GetState<Lift.LiftedState>().CurrentState}");
 
             Capability.PerformAction<Lift.PickUp>(actors, item1);
             
-            Array.ForEach(actors, actor => Console.WriteLine($"Actor {actor.guid} -> Strength: {actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength)} LiftingState: {actor.GetState<Lift.LiftingState>().CurrentState}"));
-            Console.WriteLine($"Item {item1.guid} -> Weight: {item1.Attributes.GetAttributeValue(PhysicalAttributes.Weight)} LiftedState: {item1.GetState<Lift.LiftedState>().CurrentState}");
+            Array.ForEach(actors, actor => Console.WriteLine($"Actor {actor.Guid} -> Strength: {actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength)} LiftingState: {actor.GetState<Lift.LiftingState>().CurrentState}"));
+            Console.WriteLine($"Item {item1.Guid} -> Weight: {item1.Attributes.GetAttributeValue(PhysicalAttributes.Weight)} LiftedState: {item1.GetState<Lift.LiftedState>().CurrentState}");
 
             Capability.PerformAction<Lift.PutDown>(actors[3..5], item1);
             
-            Array.ForEach(actors, actor => Console.WriteLine($"Actor {actor.guid} -> Strength: {actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength)} LiftingState: {actor.GetState<Lift.LiftingState>().CurrentState}"));
-            Console.WriteLine($"Item {item1.guid} -> Weight: {item1.Attributes.GetAttributeValue(PhysicalAttributes.Weight)} LiftedState: {item1.GetState<Lift.LiftedState>().CurrentState}");
+            Array.ForEach(actors, actor => Console.WriteLine($"Actor {actor.Guid} -> Strength: {actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength)} LiftingState: {actor.GetState<Lift.LiftingState>().CurrentState}"));
+            Console.WriteLine($"Item {item1.Guid} -> Weight: {item1.Attributes.GetAttributeValue(PhysicalAttributes.Weight)} LiftedState: {item1.GetState<Lift.LiftedState>().CurrentState}");
 
         }
     }

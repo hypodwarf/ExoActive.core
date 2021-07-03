@@ -1,5 +1,5 @@
 using System;
-using static ExoActive.ExoActive<System.Enum, int>;
+using ExoActive;
 
 namespace Tests
 {

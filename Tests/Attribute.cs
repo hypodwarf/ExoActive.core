@@ -9,22 +9,22 @@ namespace Tests
         [Test]
         public void CanCreate()
         {
-            var x = new ExoActive<bool, float>.Attribute("Jason", 1);
-            var y = new ExoActive<bool, string>.Attribute("Rohman", "Hi");
-            var z = new ExoActive<bool, Exception>.Attribute("Exception", new Exception());
+            var x = new ExoActive.Attribute("Jason", 1);
+            // var y = new ExoActive<bool, string>.Attribute("Rohman", "Hi");
+            // var z = new ExoActive<bool, Exception>.Attribute("Exception", new Exception());
             Assert.Pass();
         }
 
         [Test]
         public void CanInsertMultipleBranches()
         {
-            var a = new ExoActive<bool, float>.Attribute("a", 1);
-            var u = new ExoActive<bool, float>.Attribute("u", 1);
-            var v = new ExoActive<bool, float>.Attribute("v", 1);
-            var w = new ExoActive<bool, float>.Attribute("w", 1);
-            var x = new ExoActive<bool, float>.Attribute("x", 1);
-            var y = new ExoActive<bool, float>.Attribute("y", 1);
-            var z = new ExoActive<bool, float>.Attribute("z", 1);
+            var a = new ExoActive.Attribute("a", 1);
+            var u = new ExoActive.Attribute("u", 1);
+            var v = new ExoActive.Attribute("v", 1);
+            var w = new ExoActive.Attribute("w", 1);
+            var x = new ExoActive.Attribute("x", 1);
+            var y = new ExoActive.Attribute("y", 1);
+            var z = new ExoActive.Attribute("z", 1);
 
             var v1 = v.InsertModifier(u);
             var w1 = w.InsertModifier(v1);
@@ -65,9 +65,9 @@ namespace Tests
         [Test]
         public void CannotInsertDuplicateChild()
         {
-            var x = new ExoActive<bool, float>.Attribute("x", 1);
-            var y = new ExoActive<bool, float>.Attribute("y", 1);
-            var z = new ExoActive<bool, float>.Attribute("z", 1);
+            var x = new ExoActive.Attribute("x", 1);
+            var y = new ExoActive.Attribute("y", 1);
+            var z = new ExoActive.Attribute("z", 1);
 
             var y1 = y.InsertModifier(x);
             var z1 = z.InsertModifier(y);
@@ -79,7 +79,7 @@ namespace Tests
         [Test]
         public void CanInsertSelfAsChild()
         {
-            var z = new ExoActive<bool, float>.Attribute("z", 1);
+            var z = new ExoActive.Attribute("z", 1);
             var z1 = z.InsertModifier(z);
 
             Assert.AreEqual(2f, z1.modifiedValue.value);
@@ -96,13 +96,13 @@ namespace Tests
         [Test]
         public void CanRemoveChild()
         {
-            var a = new ExoActive<bool, float>.Attribute("a", 1);
-            var u = new ExoActive<bool, float>.Attribute("u", 2);
-            var v = new ExoActive<bool, float>.Attribute("v", 1);
-            var w = new ExoActive<bool, float>.Attribute("w", 1);
-            var x = new ExoActive<bool, float>.Attribute("x", 3);
-            var y = new ExoActive<bool, float>.Attribute("y", 1);
-            var z = new ExoActive<bool, float>.Attribute("z", 1);
+            var a = new ExoActive.Attribute("a", 1);
+            var u = new ExoActive.Attribute("u", 2);
+            var v = new ExoActive.Attribute("v", 1);
+            var w = new ExoActive.Attribute("w", 1);
+            var x = new ExoActive.Attribute("x", 3);
+            var y = new ExoActive.Attribute("y", 1);
+            var z = new ExoActive.Attribute("z", 1);
 
             var v2 = v.InsertModifier(u);
             var w2 = w.InsertModifier(v2);
@@ -124,9 +124,9 @@ namespace Tests
         [Test]
         public void CanReset()
         {
-            var x = new ExoActive<bool, float>.Attribute("a", 1);
-            var y = new ExoActive<bool, float>.Attribute("u", 2);
-            var z = new ExoActive<bool, float>.Attribute("v", 3);
+            var x = new ExoActive.Attribute("a", 1);
+            var y = new ExoActive.Attribute("u", 2);
+            var z = new ExoActive.Attribute("v", 3);
             
             var x2 = x.InsertModifier(y);
             var x3 = x2.InsertModifier(z);
@@ -140,13 +140,13 @@ namespace Tests
         [Test]
         public void CanUpdateChild()
         {
-            var a = new ExoActive<bool, float>.Attribute("a", 1);
-            var u = new ExoActive<bool, float>.Attribute("u", 2);
-            var v = new ExoActive<bool, float>.Attribute("v", 1);
-            var w = new ExoActive<bool, float>.Attribute("w", 1);
-            var x = new ExoActive<bool, float>.Attribute("x", 3);
-            var y = new ExoActive<bool, float>.Attribute("y", 1);
-            var z = new ExoActive<bool, float>.Attribute("z", 1);
+            var a = new ExoActive.Attribute("a", 1);
+            var u = new ExoActive.Attribute("u", 2);
+            var v = new ExoActive.Attribute("v", 1);
+            var w = new ExoActive.Attribute("w", 1);
+            var x = new ExoActive.Attribute("x", 3);
+            var y = new ExoActive.Attribute("y", 1);
+            var z = new ExoActive.Attribute("z", 1);
 
             var v2 = v.InsertModifier(u);
             var w2 = w.InsertModifier(v2);
