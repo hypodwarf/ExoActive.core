@@ -198,7 +198,7 @@ namespace ExoActive
             new DefaultEqualityComparer();
     }
 
-    public abstract partial class Entity : IEquatable<Entity>
+    public partial class Entity : IEquatable<Entity>
     {
         public bool Equals(Entity other)
         {

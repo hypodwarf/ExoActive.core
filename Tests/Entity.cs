@@ -1,5 +1,6 @@
 using System;
 using ExoActive;
+using NUnit.Framework;
 
 namespace Tests
 {
@@ -26,5 +27,19 @@ namespace Tests
 
     public class EntityTest
     {
+        [Test]
+        public void CanGetAttributeValues()
+        {
+            var E = new TestEntity();
+            Assert.AreEqual(10L, E.Attributes.GetAttributeValue(TestEntity.EntityAttributes.Strength));
+            // data.subject.Attributes.GetAttributeValue(target.Traits.Value<EquipmentTraits>() | EquipmentTraits.Equip);
+        }
+
+        [Test]
+        public void CanHandleInvalidAttriutes()
+        {
+            var E = new TestEntity();
+            Assert.AreEqual(-1L, E.Attributes.GetAttributeValue(TestEntity.EntityTraits.Happy, -1L));
+        }
     }
 }

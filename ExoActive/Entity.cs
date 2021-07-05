@@ -18,7 +18,7 @@ namespace ExoActive
     }
     
     [DataContract]
-    public abstract partial class Entity : IEntity
+    public partial class Entity : IEntity
     {
         [DataMember] protected readonly Guid guid = Guid.NewGuid();
         [DataMember] protected readonly Dictionary<string, EntityStateMachine> states = new();
