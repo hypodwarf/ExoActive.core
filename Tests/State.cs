@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using ExoActive;
 using NUnit.Framework;
 
@@ -63,7 +64,7 @@ namespace Tests
         public static readonly TriggerWithParameters<int> FillSome = new(Trigger.Fill);
         public static readonly TriggerWithParameters<int> DrinkSome = new(Trigger.Drink);
 
-        public int Amount { get; private set; }
+        [DataMember] public int Amount { get; private set; }
 
         private State nextState(int change)
         {
@@ -163,24 +164,24 @@ namespace Tests
         public void StateTime()
         {
             var cup = new DynamicCup();
+            var start = TimeTicker.Ticks;
 
-            Assert.AreEqual(0, TimeTicker.Ticks);
             Assert.AreEqual(0, cup.LastTransitionTick);
 
             TimeTicker.AddTicks(100);
-            Assert.AreEqual(100, TimeTicker.Ticks);
+            Assert.AreEqual(start + 100, TimeTicker.Ticks);
             Assert.AreEqual(0, cup.LastTransitionTick);
 
             TimeTicker.AddTicks(100);
 
-            Assert.AreEqual(200, TimeTicker.Ticks);
+            Assert.AreEqual(start + 200, TimeTicker.Ticks);
             Assert.AreEqual(0, cup.LastTransitionTick);
 
             cup.Fire(DynamicCup.FillSome, 25);
             Assert.AreEqual(25, cup.Amount);
 
-            Assert.AreEqual(200, TimeTicker.Ticks);
-            Assert.AreEqual(200, cup.LastTransitionTick);
+            Assert.AreEqual(start + 200, TimeTicker.Ticks);
+            Assert.AreEqual(start + 200, cup.LastTransitionTick);
 
             TimeTicker.AddTicks(1);
 

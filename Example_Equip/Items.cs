@@ -7,6 +7,7 @@ namespace Example_Equip
         public Ring()
         {
             attributes.Add(PhysicalAttributes.Weight, 1);
+            attributes.Add( PhysicalAttributes.Strength, 2);
             traits.Add(EquipmentTraits.Ring);
         }
     }
@@ -16,6 +17,8 @@ namespace Example_Equip
         public Belt()
         {
             attributes.Add(PhysicalAttributes.Weight, 3);
+            
+            attributes.Add( PhysicalAttributes.Strength, 5);
             traits.Add(EquipmentTraits.Belt);
         }
     }

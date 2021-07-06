@@ -38,6 +38,7 @@ namespace ExoActive
         public void AddState(EntityStateMachine state)
         {
             states.Add(state.Id, state);
+            state.Owner = this.Guid;
         }
 
         public TStateMachine GetState<TStateMachine>() 

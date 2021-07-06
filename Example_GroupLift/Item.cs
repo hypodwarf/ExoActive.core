@@ -7,7 +7,6 @@ namespace Example_GroupLift
         public Item()
         {
             attributes.Add(PhysicalAttributes.Weight, 2);
-            attributes.Add(LiftingAttributes.Holds, 2);
             traits.Add(LiftingTraits.Lifteable);
         }
     }

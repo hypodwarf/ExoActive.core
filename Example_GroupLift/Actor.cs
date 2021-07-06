@@ -9,7 +9,6 @@ namespace Example_GroupLift
         {
             attributes.Add(PhysicalAttributes.Strength, new Random().Next(2,10));
             attributes.Add(PhysicalAttributes.Weight, 3);
-            attributes.Add(LiftingAttributes.Limbs, 2);
             traits.Add(LiftingTraits.CanLift);
         }
     }

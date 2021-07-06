@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ExoActive;
 
 namespace Example_Equip
@@ -15,12 +16,16 @@ namespace Example_Equip
             Ring ring3 = new Ring();
             Belt belt1 = new Belt();
             Belt belt2 = new Belt();
+            
+            actor.Attributes.ToList().ForEach(val => Console.WriteLine($"{val.Key}: {val.Value.modifiedValue.value}"));
 
             Console.WriteLine($"Equipped 1st ring: {Capability.PerformAction<Equip.EquipItem>(actor, ring1)}");
             Console.WriteLine($"Equipped 2nd ring: {Capability.PerformAction<Equip.EquipItem>(actor, ring2)}");
             Console.WriteLine($"Equipped 3rd ring: {Capability.PerformAction<Equip.EquipItem>(actor, ring3)}");
             Console.WriteLine($"Equipped 1st belt: {Capability.PerformAction<Equip.EquipItem>(actor, belt1)}");
             Console.WriteLine($"Equipped 2nd belt: {Capability.PerformAction<Equip.EquipItem>(actor, belt2)}");
+            
+            actor.Attributes.ToList().ForEach(val => Console.WriteLine($"{val.Key}: {val.Value.modifiedValue.value}"));
             
             Console.WriteLine($"Unequipped 1st ring: {Capability.PerformAction<Equip.UnequipItem>(actor, ring1)}");
             Console.WriteLine($"Equipped 3rd ring: {Capability.PerformAction<Equip.EquipItem>(actor, ring3)}");

@@ -17,7 +17,10 @@ namespace Example_Effect
             public void PerformAction(CapabilityProcessData data)
             {
                 var damageDone = data.actors.Aggregate(0L,
-                    (power, actor) => power + actor.Attributes.GetAttributeValue(WeaponAttributes.Power));
+                    (power, actor) => (
+                        actor.Attributes.GetAttributeValue(HealthAttributes.Health) > 0 ?
+                        actor.Attributes.GetAttributeValue(WeaponAttributes.Power) : 0
+                        ) + power);
 
                 data.subject.Attributes.AdjustNamedModifier(HealthAttributes.Health, DAMAGE, -damageDone);
             }

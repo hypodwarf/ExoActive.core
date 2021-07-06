@@ -261,7 +261,8 @@ namespace ExoActive
                 if (x.GetType() != y.GetType()) return false;
                 return x.CurrentState.Equals(y.CurrentState)
                        && x.LastTransitionTick == y.LastTransitionTick
-                       && x.Entities.SequenceEqual(y.Entities);
+                       && x.Entities.SequenceEqual(y.Entities)
+                       && x.Owner.Equals(y.Owner);
             }
 
             public int GetHashCode(EntityStateMachine obj)
@@ -270,7 +271,8 @@ namespace ExoActive
                 {
                     return (obj.CurrentState.GetHashCode() * 31) +
                            (obj.LastTransitionTick.GetHashCode() * 31) +
-                           (obj.Entities.GetHashCode() * 31);
+                           (obj.Entities.GetHashCode() * 31) +
+                           (obj.Owner.GetHashCode() * 31);
                 }
             }
         }

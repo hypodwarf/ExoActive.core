@@ -10,8 +10,9 @@ namespace Example_Effect
             private const string HEALING = "Healing";
             public bool PassesRequirements(CapabilityProcessData data)
             {
-                return data.subject.Attributes.Has(WeaponAttributes.Power)
-                    && data.targets.All(actor => actor.Attributes.Has(HealthAttributes.Health));
+                return data.subject.Attributes.Has(WeaponAttributes.Power) 
+                       && data.subject.Attributes.GetAttributeValue(HealthAttributes.Health) > 0 
+                       && data.targets.All(actor => actor.Attributes.Has(HealthAttributes.Health));
             }
 
             public void PerformAction(CapabilityProcessData data)

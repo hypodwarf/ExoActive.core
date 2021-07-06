@@ -64,7 +64,11 @@ namespace ExoActive
 
         public string Id => StateHelper.Id(this);
 
+        [DataMember] public Guid Owner { get; set; }
+        
         [DataMember] public EntitySet Entities { get; private set; }
+        
+        [DataMember] public EntityWatch EntityWatch { get; private set; }
 
         [DataMember] public ulong LastTransitionTick { get; private set; }
 
@@ -82,6 +86,7 @@ namespace ExoActive
             OnTransitionCompleted += TransitionHandler;
             TimeTicker.TickEvent += OnTickEvent;
             Entities = new EntitySet();
+            EntityWatch = new EntityWatch();
         }
 
         public void Fire(Enum trigger, CapabilityProcessData data)

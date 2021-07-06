@@ -84,6 +84,28 @@ namespace Tests
 
             Assert.That(dCup, Is.EqualTo(cup).Using(EntityStateMachine.DefaultComparer));
         }
+        
+        [Test]
+        public void StateTickEvent()
+        {
+            var cup = new DynamicCup();
+            
+            cup.Fire(DynamicCup.FillSome, 25);
+            
+            var jsonString = Serialize(cup);
+            
+            Console.WriteLine(jsonString);
+            
+            var dCup = Deserialize<DynamicCup>(jsonString);
+
+            Assert.That(dCup, Is.EqualTo(cup).Using(EntityStateMachine.DefaultComparer));
+            Assert.AreEqual(cup.Amount, dCup.Amount);
+            
+            TimeTicker.AddTicks(1);
+            Assert.AreEqual(24, cup.Amount);
+            
+            Assert.AreEqual(cup.Amount, dCup.Amount);
+        }
 
         [Test]
         public void EntitySerialization()
