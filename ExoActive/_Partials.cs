@@ -262,7 +262,7 @@ namespace ExoActive
                 return x.CurrentState.Equals(y.CurrentState)
                        && x.LastTransitionTick == y.LastTransitionTick
                        && x.Entities.SequenceEqual(y.Entities)
-                       && x.Owner.Equals(y.Owner);
+                       && x.owner.Equals(y.owner);
             }
 
             public int GetHashCode(EntityStateMachine obj)

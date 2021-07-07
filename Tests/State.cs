@@ -29,7 +29,6 @@ namespace Tests
         {
             Configure(State.Empty)
                 .OnEntry(() => Amount = 0)
-                .OnEntryFrom(GetTrigger(Trigger.Drink), data => Entities.Remove(data.subject))
                 .Permit(Trigger.Fill, State.HalfFull);
 
             Configure(State.HalfFull)
@@ -40,7 +39,6 @@ namespace Tests
 
             Configure(State.Full)
                 .OnEntry(() => Amount = 100)
-                .OnEntryFrom(GetTrigger(Trigger.Fill), data => Entities.Add(data.subject))
                 .Permit(Trigger.Drink, State.HalfFull);
         }
     }

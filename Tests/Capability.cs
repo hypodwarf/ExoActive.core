@@ -61,7 +61,6 @@ namespace Tests
             Assert.True(fill.PerformAction(actors));
 
             Assert.AreEqual(Cup.State.Full, entity.GetState<Cup>().CurrentState);
-            Assert.AreEqual(1, entity.GetState<Cup>().Entities.Count);
 
             Assert.False(fill.PerformAction(actors));
             Assert.True(drink.PerformAction(actors));

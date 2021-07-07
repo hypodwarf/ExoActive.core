@@ -93,38 +93,38 @@ namespace Example_GroupLift
 
             private void AddHolder(CapabilityProcessData data)
             {
-                data.actors.ForEach(actor => Entities.Add(actor, PhysicalAttributes.Weight));
+                data.targets.ForEach(holder => Entities.Add(holder, PhysicalAttributes.Weight));
             }
 
             private void RemoveHolder(CapabilityProcessData data)
             {
-                data.actors.ForEach(actor =>
+                data.targets.ForEach(holder =>
                 {
-                    data.subject.Attributes.Revert(Entities[actor]);
-                    Entities.Remove(actor);
+                    Owner.Attributes.Revert(Entities[holder]);
+                    Entities.Remove(holder);
                 });
             }
 
             private Enum DynamicPickUp(CapabilityProcessData data)
             {
-                var combinedStrength = data.actors.Aggregate(0L,
-                    (acc, actor) => acc + actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
+                var combinedStrength = data.targets.Aggregate(0L,
+                    (acc, holder) => acc + holder.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
 
-                var remainingWeight = data.subject.Attributes.GetAttributeValue(PhysicalAttributes.Weight);
+                var remainingWeight = Owner.Attributes.GetAttributeValue(PhysicalAttributes.Weight);
 
                 return combinedStrength >= remainingWeight ? State.Aloft : State.Grappled;
             }
 
             private Enum DynamicPutdown(CapabilityProcessData data)
             {
-                if (Entities.Count == data.actors.Count) return State.Released;
+                if (Entities.Count == data.targets.Count) return State.Released;
 
-                var returnedWeight = Entities.Where(entity => data.actors.ConvertAll(e => e.Guid).Contains(entity.Key))
+                var returnedWeight = Entities.Where(entity => data.targets.ConvertAll(e => e.Guid).Contains(entity.Key))
                     .Aggregate(0L,
                         (acc, kvp) => acc + kvp.Value.GetAttributeValue(PhysicalAttributes.Weight));
 
-                var availableStrength = Entities.List.Where(entity => !data.actors.Contains(entity)).Aggregate(0L,
-                    (acc, actor) => acc + actor.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
+                var availableStrength = Entities.List.Where(entity => !data.targets.Contains(entity)).Aggregate(0L,
+                    (acc, holder) => acc + holder.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
 
                 return availableStrength >= -returnedWeight ? State.Aloft : State.Grappled;
             }
@@ -173,7 +173,7 @@ namespace Example_GroupLift
             {
                 data.targets.ForEach(target =>
                 {
-                    data.subject.Attributes.Revert(Entities[target]);
+                    Owner.Attributes.Revert(Entities[target]);
                     Entities.Remove(target);
                 });
 
@@ -196,7 +196,7 @@ namespace Example_GroupLift
             // The actor cannot already be lifting an object
             private static bool NotAlreadyHolding(CapabilityProcessData data)
             {
-                return !data.subject.GetState<LiftingState>().CurrentState.Equals(LiftingState.State.Lifting);
+                return data.actors.All(actor => !actor.GetState<LiftingState>().CurrentState.Equals(LiftingState.State.Lifting));
             }
 
             // Must be at least one target
@@ -228,7 +228,7 @@ namespace Example_GroupLift
         {
             private static bool IsHoldingCheck(CapabilityProcessData data)
             {
-                return data.targets.All(data.subject.GetState<LiftingState>().Entities.Contains);
+                return data.actors.All(actor => data.targets.All(actor.GetState<LiftingState>().Entities.Contains));
             }
 
             private static bool HasTargets(CapabilityProcessData data)

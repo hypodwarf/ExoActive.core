@@ -10,15 +10,16 @@ namespace Example_Effect
             private const string HEALING = "Healing";
             public bool PassesRequirements(CapabilityProcessData data)
             {
-                return data.subject.Attributes.Has(WeaponAttributes.Power) 
-                       && data.subject.Attributes.GetAttributeValue(HealthAttributes.Health) > 0 
-                       && data.targets.All(actor => actor.Attributes.Has(HealthAttributes.Health));
+                return data.actors.All(healer => 
+                           healer.Attributes.Has(WeaponAttributes.Power) 
+                           && healer.Attributes.GetAttributeValue(HealthAttributes.Health) > 0 )
+                       && data.targets.All(receiver => receiver.Attributes.Has(HealthAttributes.Health));
             }
 
             public void PerformAction(CapabilityProcessData data)
             {
-                var power = data.subject.Attributes.GetAttributeValue(WeaponAttributes.Power);
-                data.targets.ForEach(target => target.Attributes.AdjustNamedModifier(HealthAttributes.Health, HEALING, power));
+                var power = data.actors.Aggregate(0L, (acc, healer) => acc + healer.Attributes.GetAttributeValue(WeaponAttributes.Power));
+                data.targets.ForEach(receiver => receiver.Attributes.AdjustNamedModifier(HealthAttributes.Health, HEALING, power));
             }
         }
 

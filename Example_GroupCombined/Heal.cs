@@ -10,16 +10,18 @@ namespace Example_GroupCombined
             private const string HEALING = "Healing";
             public bool PassesRequirements(CapabilityProcessData data)
             {
-                return data.subject.Attributes.GetAttributeValue(PhysicalAttributes.Health) > 0
-                       && data.subject.Attributes.Has(PhysicalAttributes.Strength)
+                return data.actors.All(healer => 
+                           healer.Attributes.GetAttributeValue(PhysicalAttributes.Health) > 0 
+                           && healer.Attributes.Has(PhysicalAttributes.Strength)
+                       )
                        && data.targets.Count == 1
-                       && data.targets[0].Attributes.Has(PhysicalAttributes.Health);
+                       && data.targets.All(receiver => receiver.Attributes.Has(PhysicalAttributes.Health));
             }
 
             public void PerformAction(CapabilityProcessData data)
             {
-                var power = data.subject.Attributes.GetAttributeValue(PhysicalAttributes.Strength);
-                data.targets.ForEach(target => target.Attributes.AdjustNamedModifier(PhysicalAttributes.Health, HEALING, power));
+                var power = data.actors.Aggregate(0L, (acc, healer) => acc + healer.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
+                data.targets.ForEach(receiver => receiver.Attributes.AdjustNamedModifier(PhysicalAttributes.Health, HEALING, power));
             }
         }
 

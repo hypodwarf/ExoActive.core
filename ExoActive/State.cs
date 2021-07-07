@@ -64,7 +64,13 @@ namespace ExoActive
 
         public string Id => StateHelper.Id(this);
 
-        [DataMember] public Guid Owner { get; set; }
+        [DataMember] private Guid owner;
+        public IEntity Owner
+        {
+            get => Manager.Get(owner);
+            set => owner = value.Guid;
+        }
+        
         
         [DataMember] public EntitySet Entities { get; private set; }
         

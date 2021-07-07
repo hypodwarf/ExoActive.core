@@ -60,14 +60,14 @@ namespace Example_GroupCombined
                             var attributes = (Attributes)target.Attributes.Clone();
                             attributes.Add(target.Traits.Value<EquipmentTraits>() | EquipmentTraits.Equip, -1);
                             Entities.Add(target, attributes);
-                            data.subject.Attributes.Apply(attributes);
+                            Owner.Attributes.Apply(attributes);
                         });
                     })
                     .OnEntryFrom(GetTrigger(Trigger.Unequip), data =>
                     {
                         data.targets.ForEach(target =>
                         {
-                            data.subject.Attributes.Revert(Entities[target]);
+                            Owner.Attributes.Revert(Entities[target]);
                             Entities.Remove(target);
                         });
                     })
@@ -75,7 +75,7 @@ namespace Example_GroupCombined
                     {
                         return data.targets.All(target =>
                             target.GetState<ItemEquippedState>().CurrentState.Equals(ItemEquippedState.State.NotEquipped)
-                            && data.subject.Attributes.GetAttributeValue(target.Traits.Value<EquipmentTraits>() | EquipmentTraits.Equip) > 0
+                            && Owner.Attributes.GetAttributeValue(target.Traits.Value<EquipmentTraits>() | EquipmentTraits.Equip) > 0
                             );
                     })
                     .PermitReentryIf(GetTrigger(Trigger.Unequip), data =>
@@ -104,14 +104,14 @@ namespace Example_GroupCombined
                 Configure(State.NotEquipped)
                     .OnEntryFrom(GetTrigger(Trigger.Unequip), data =>
                     {
-                        data.actors.ForEach(actor => Entities.Remove(actor));
+                        data.targets.ForEach(equipper => Entities.Remove(equipper));
                     })
                     .Permit(Trigger.Equip, State.IsEquipped);
                 
                 Configure(State.IsEquipped)
                     .OnEntryFrom(GetTrigger(Trigger.Equip), data =>
                     {
-                        data.actors.ForEach(actor => Entities.Add(actor));
+                        data.targets.ForEach(equipper => Entities.Add(equipper));
                     })
                     .Permit(Trigger.Unequip, State.NotEquipped);
             }

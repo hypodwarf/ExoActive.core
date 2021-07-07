@@ -1,12 +1,13 @@
 using System;
+using System.Linq;
 
 namespace ExoActive
 {
     public interface IRequirement
     {
-        public bool Passes(IEntity entity, CapabilityProcessData data);
+        public bool Passes(CapabilityProcessData data);
 
-        public delegate bool Check(IEntity entity, CapabilityProcessData data = default);
+        public delegate bool Check(CapabilityProcessData data = default);
     }
 
     public class TraitRequirement : IRequirement
@@ -20,15 +21,15 @@ namespace ExoActive
             RequiredValue = requiredValue;
         }
 
-        public bool Passes(IEntity entity, CapabilityProcessData data)
+        public bool Passes(CapabilityProcessData data)
         {
-            return entity.Traits.Has(Trait) == RequiredValue;
+            return data.actors.All(actor => actor.Traits.Has(Trait) == RequiredValue);
         }
 
         public static IRequirement.Check Create(Enum trait, bool requiredValue = true)
         {
             var req = new TraitRequirement(trait, requiredValue);
-            return (entity, data) => req.Passes(entity, data);
+            return data => req.Passes(data);
         }
     }
 
@@ -36,26 +37,26 @@ namespace ExoActive
     {
         public delegate bool Evaluate(long value, long threshold);
 
-        private readonly System.Enum attribute;
+        private readonly Enum attribute;
         private readonly long threshold;
         private readonly Evaluate evaluation;
 
-        private AttributeRequirement(System.Enum attribute, long threshold, Evaluate evaluation)
+        private AttributeRequirement(Enum attribute, long threshold, Evaluate evaluation)
         {
             this.attribute = attribute;
             this.threshold = threshold;
             this.evaluation = evaluation;
         }
 
-        public bool Passes(IEntity entity, CapabilityProcessData data)
+        public bool Passes(CapabilityProcessData data)
         {
-            return evaluation(entity.Attributes.GetAttributeValue(attribute), threshold);
+            return data.actors.All(actor => evaluation(actor.Attributes.GetAttributeValue(attribute), threshold));
         }
 
-        public static IRequirement.Check Create(System.Enum attribute, long threshold, Evaluate evaluation)
+        public static IRequirement.Check Create(Enum attribute, long threshold, Evaluate evaluation)
         {
             var req = new AttributeRequirement(attribute, threshold, evaluation);
-            return (entity, data) => req.Passes(entity, data);
+            return data => req.Passes(data);
         }
     }
 
@@ -71,15 +72,15 @@ namespace ExoActive
             Permitted = permitted;
         }
 
-        public bool Passes(IEntity entity, CapabilityProcessData data)
+        public bool Passes(CapabilityProcessData data)
         {
-            return entity.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted;
+            return data.actors.All(actor => actor.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted);
         }
 
         public static IRequirement.Check Create(Enum trigger, bool permitted = true)
         {
             var req = new StateRequirement<TStateMachine>(trigger, permitted);
-            return (entity, data) => req.Passes(entity, data);
+            return data => req.Passes(data);
         }
     }
 }

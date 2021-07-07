@@ -6,14 +6,14 @@ namespace ExoActive
 {
     public readonly struct CapabilityProcessData
     {
-        public readonly IEntity subject;
+        // public readonly IEntity subject;
         public readonly List<IEntity> actors;
         public readonly List<IEntity> targets;
 
-        public CapabilityProcessData(IEntity subject, List<IEntity> actors,
+        public CapabilityProcessData(List<IEntity> actors,
             List<IEntity> targets)
         {
-            this.subject = subject;
+            // this.subject = subject;
             this.actors = actors;
             this.targets = targets;
         }
@@ -36,7 +36,8 @@ namespace ExoActive
     {
         public static Action<CapabilityProcessData> FireAction(Enum trigger)
         {
-            return data => data.subject.GetState<TStateMachine>().Fire(trigger, data);
+            // return data => data.subject.GetState<TStateMachine>().Fire(trigger, data);
+            return data => data.actors.ForEach(actor => actor.GetState<TStateMachine>().Fire(trigger, data));
         }
 
         // public static CapabilityStateProcess<S> CreateFireAction(Enum trigger)
@@ -65,8 +66,7 @@ namespace ExoActive
 
         protected event Action<CapabilityProcessData> ActionEvent;
 
-        protected readonly IList<IRequirement.Check> Requirements =
-            new List<IRequirement.Check>();
+        protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
 
         protected static TStateMachine GetState(IEntity entity)
         {
@@ -80,8 +80,15 @@ namespace ExoActive
 
         public bool PassesRequirements(CapabilityProcessData data)
         {
-            if (!data.subject.HasState<TStateMachine>()) data.subject.AddState(CreateState());
-            return Requirements.All(req => req(data.subject, data));
+            // if (!data.subject.HasState<TStateMachine>()) data.subject.AddState(CreateState());
+            // return Requirements.All(req => req(data.subject, data));
+            
+            // Make sure all actors have the state
+            data.actors.ForEach(actor =>
+            {
+                if (!actor.HasState<TStateMachine>()) actor.AddState(CreateState());
+            });
+            return Requirements.All(req => req(data));
         }
 
         public virtual void PerformAction(CapabilityProcessData data)
@@ -123,14 +130,18 @@ namespace ExoActive
 
         public bool PassesRequirements(CapabilityProcessData data)
         {
-            if (!data.subject.HasState<TStateMachine>())
-                data.subject.AddState(StateHelper<TStateMachine>.CreateState());
-            return requirement(data.subject, data);
+            // Make sure all actors have the state
+            data.actors.ForEach(actor =>
+            {
+                if (!actor.HasState<TStateMachine>()) actor.AddState(StateHelper<TStateMachine>.CreateState());
+            });
+            return requirement(data);
         }
 
         public void PerformAction(CapabilityProcessData data)
         {
-            data.subject.GetState<TStateMachine>().Fire(trigger, data);
+            // data.subject.GetState<TStateMachine>().Fire(trigger, data);
+            data.actors.ForEach(actor => actor.GetState<TStateMachine>().Fire(trigger, data));
         }
     }
 
@@ -222,12 +233,10 @@ namespace ExoActive
 
         public bool PassesRequirements(List<IEntity> actors, List<IEntity> targets = null)
         {
-            return actorActions.All(action => actors.All(actor =>
-                       action.PassesRequirements(
-                           new CapabilityProcessData(actor, actors, targets)))) &&
-                   targetActions.All(action => (targets ?? new List<IEntity>()).All(target =>
-                       action.PassesRequirements(
-                           new CapabilityProcessData(target, actors, targets))));
+            return actorActions.All(action => action.PassesRequirements(
+                           new CapabilityProcessData(actors, targets))) &&
+                   targetActions.All(action => action.PassesRequirements(
+                           new CapabilityProcessData(targets, actors)));
         }
 
         public bool PerformAction(List<IEntity> actors, List<IEntity> targets = null)
@@ -235,11 +244,8 @@ namespace ExoActive
             if (PassesRequirements(actors, targets))
             {
                 BeforeAction(actors, targets);
-                actorActions.ForEach(action => actors.ForEach(actor =>
-                    action.PerformAction(new CapabilityProcessData(actor, actors, targets))));
-                if (targets != null)
-                    targetActions.ForEach(action => targets.ForEach(target =>
-                        action.PerformAction(new CapabilityProcessData(target, actors, targets))));
+                actorActions.ForEach(action => action.PerformAction(new CapabilityProcessData(actors, targets)));
+                targetActions.ForEach(action => action.PerformAction(new CapabilityProcessData(targets, actors)));
                 AfterAction(actors, targets);
                 return true;
             }
