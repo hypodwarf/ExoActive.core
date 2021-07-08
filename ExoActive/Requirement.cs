@@ -65,21 +65,34 @@ namespace ExoActive
     {
         private readonly Enum Trigger;
         private readonly bool Permitted;
+        private readonly DataSelect Selector;
 
-        private StateRequirement(Enum trigger, bool permitted = true)
+        private StateRequirement(Enum trigger, DataSelect selector, bool permitted = true)
         {
             Trigger = trigger;
             Permitted = permitted;
+            Selector = selector;
         }
 
         public bool Passes(CapabilityProcessData data)
         {
-            return data.actors.All(actor => actor.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted);
+            bool passes = true;
+            if (Selector.HasFlag(DataSelect.Actors))
+            {
+                passes = data.actors.All(actor => actor.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted);
+            }
+            
+            if (Selector.HasFlag(DataSelect.Targets))
+            {
+                passes = passes && data.targets.All(target => target.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted);
+            }
+
+            return passes;
         }
 
-        public static IRequirement.Check Create(Enum trigger, bool permitted = true)
+        public static IRequirement.Check Create(Enum trigger, DataSelect selector, bool permitted = true)
         {
-            var req = new StateRequirement<TStateMachine>(trigger, permitted);
+            var req = new StateRequirement<TStateMachine>(trigger, selector, permitted);
             return data => req.Passes(data);
         }
     }

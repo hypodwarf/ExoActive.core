@@ -26,7 +26,7 @@ namespace Tests
         [Test]
         public void CanCreate()
         {
-            var c = new Traits();
+            var _ = new Traits();
             Assert.Pass();
         }
 

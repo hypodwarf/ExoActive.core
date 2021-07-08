@@ -23,10 +23,7 @@ namespace Example_Effect
             }
         }
 
-        public Heal() : base(new ICapabilityProcess[]
-        {
-            new ImproveHealth()
-        }, new ICapabilityProcess[]{})
+        public Heal() : base(new ImproveHealth())
         {
         }
     }

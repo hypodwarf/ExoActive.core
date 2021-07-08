@@ -4,31 +4,16 @@ using NUnit.Framework;
 
 namespace Tests
 {
-    // Creating the Capability using the CapabilityTriggerProcess
     public class TestCapabilityDrink : Capability
     {
-        public TestCapabilityDrink() : base(
-            new ICapabilityProcess[] { CapabilityTriggerProcess<Cup>.Get(Cup.Trigger.Drink) })
+        public TestCapabilityDrink() : base(CapabilityTriggerProcess<Cup>.Get(Cup.Trigger.Drink, DataSelect.Actors))
         { }
     }
-
-    // Creating the Capability using the CapabilityStateProcess
+    
     public class TestCapabilityFill : Capability
     {
-        private static readonly CapabilityStateProcess<Cup> TriggerProcess = CapabilityStateProcess<Cup>.Create(
-            new[]
-            {
-                CapabilityStateProcess<Cup>.FireAction(Cup.Trigger.Fill)
-            },
-            new[]
-            {
-                RequirementTest.CanFill
-            }
-        );
-
-        public TestCapabilityFill() : base(new ICapabilityProcess[] {TriggerProcess})
-        {
-        }
+        public TestCapabilityFill() : base(CapabilityTriggerProcess<Cup>.Get(Cup.Trigger.Fill, DataSelect.Actors))
+        { }
     }
 
     public class CapabilityTest

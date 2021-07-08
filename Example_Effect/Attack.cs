@@ -16,19 +16,16 @@ namespace Example_Effect
 
             public void PerformAction(CapabilityProcessData data)
             {
-                var damageDone = data.targets.Sum(attacker => 
+                var damageDone = data.actors.Sum(attacker => 
                     attacker.Attributes.GetAttributeValue(HealthAttributes.Health) > 0 ? 
                         attacker.Attributes.GetAttributeValue(WeaponAttributes.Power) : 0
                 );
 
-                data.actors.ForEach(victim => victim.Attributes.AdjustNamedModifier(HealthAttributes.Health, DAMAGE, -damageDone));
+                data.targets.ForEach(victim => victim.Attributes.AdjustNamedModifier(HealthAttributes.Health, DAMAGE, -damageDone));
             }
         }
         
-        public Attack() : base(new ICapabilityProcess[]{}, new ICapabilityProcess[]
-        {
-            new ReduceHealth()
-        })
+        public Attack() : base(new ReduceHealth())
         {
         }
     }

@@ -111,19 +111,11 @@ namespace Tests
         public void EntitySerialization()
         {
             var entity = new TestEntity();
-            var jsonString = Serialize(entity);
-
-            // Console.WriteLine(jsonString);
-
-            // var dEntity = Deserialize<TestEntity>(jsonString);
-
-            // Assert.That(dEntity, Is.EqualTo(entity).Using(IEntity.DefaultComparer));
 
             var fill = Capability.Get<TestCapabilityFill>();
-            var drink = Capability.Get<TestCapabilityDrink>();
 
             fill.PerformAction(new List<IEntity>() {entity});
-            jsonString = Serialize(entity);
+            var jsonString = Serialize(entity);
 
             Console.WriteLine(jsonString);
 
@@ -135,7 +127,7 @@ namespace Tests
         [Test]
         public void ManagerSerialization()
         {
-            var e = Manager.New<TestEntity>();
+            var _ = Manager.New<TestEntity>();
             var jsonString = Serialize(Manager.Entities);
             
             Console.WriteLine(jsonString);

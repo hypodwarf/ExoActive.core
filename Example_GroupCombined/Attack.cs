@@ -24,9 +24,7 @@ namespace Example_GroupCombined
             }
         }
         
-        public Attack() : base(new ICapabilityProcess[]{
-            new HitTarget()
-        })
+        public Attack() : base(new HitTarget())
         {
         }
     }

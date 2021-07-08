@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using ExoActive;
 
@@ -9,14 +8,8 @@ namespace Example_Equip
         public class EquipItem : Capability
         {
             public EquipItem() : base(
-                new ICapabilityProcess[]
-                {
-                    CapabilityTriggerProcess<EquipmentState>.Get(EquipmentState.Trigger.Equip)
-                },
-                new ICapabilityProcess[]
-                {
-                    CapabilityTriggerProcess<ItemEquippedState>.Get(ItemEquippedState.Trigger.Equip)
-                })
+                CapabilityTriggerProcess<EquipmentState>.Get(EquipmentState.Trigger.Equip, DataSelect.Actors), 
+                CapabilityTriggerProcess<ItemEquippedState>.Get(ItemEquippedState.Trigger.Equip, DataSelect.Targets))
             {
             }
         }
@@ -24,14 +17,8 @@ namespace Example_Equip
         public class UnequipItem : Capability
         {
             public UnequipItem() : base(
-                new ICapabilityProcess[]
-                {
-                    CapabilityTriggerProcess<EquipmentState>.Get(EquipmentState.Trigger.Unequip)
-                },
-                new ICapabilityProcess[]
-                {
-                    CapabilityTriggerProcess<ItemEquippedState>.Get(ItemEquippedState.Trigger.Unequip)
-                })
+                CapabilityTriggerProcess<EquipmentState>.Get(EquipmentState.Trigger.Unequip, DataSelect.Actors), 
+                CapabilityTriggerProcess<ItemEquippedState>.Get(ItemEquippedState.Trigger.Unequip, DataSelect.Targets))
             {
             }
         }
@@ -103,14 +90,14 @@ namespace Example_Equip
                 Configure(State.NotEquipped)
                     .OnEntryFrom(GetTrigger(Trigger.Unequip), data =>
                     {
-                        data.targets.ForEach(equipper => Entities.Remove(equipper));
+                        data.actors.ForEach(equipper => Entities.Remove(equipper));
                     })
                     .Permit(Trigger.Equip, State.IsEquipped);
                 
                 Configure(State.IsEquipped)
                     .OnEntryFrom(GetTrigger(Trigger.Equip), data =>
                     {
-                        data.targets.ForEach(equipper => Entities.Add(equipper));
+                        data.actors.ForEach(equipper => Entities.Add(equipper));
                     })
                     .Permit(Trigger.Unequip, State.NotEquipped);
             }

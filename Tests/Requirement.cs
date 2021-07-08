@@ -6,8 +6,8 @@ namespace Tests
 {
     public class RequirementTest
     {
-        public static readonly IRequirement.Check CanFill = StateRequirement<Cup>.Create(Cup.Trigger.Fill);
-        public static readonly IRequirement.Check CanDrink = StateRequirement<Cup>.Create(Cup.Trigger.Drink);
+        public static readonly IRequirement.Check CanFill = StateRequirement<Cup>.Create(Cup.Trigger.Fill, DataSelect.Actors);
+        public static readonly IRequirement.Check CanDrink = StateRequirement<Cup>.Create(Cup.Trigger.Drink, DataSelect.Actors);
 
         public bool GTE(long value, long threshold)
         {

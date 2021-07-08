@@ -100,7 +100,7 @@ namespace Example_GroupCombined
 
             private void AddHolder(CapabilityProcessData data)
             {
-                data.targets.ForEach(holder =>
+                data.actors.ForEach(holder =>
                 {
                     Entities.Add(holder, PhysicalAttributes.Weight);
                     EntityWatch.Add(holder, PhysicalAttributes.Strength);
@@ -109,7 +109,7 @@ namespace Example_GroupCombined
 
             private void RemoveHolder(CapabilityProcessData data)
             {
-                data.targets.ForEach(holder =>
+                data.actors.ForEach(holder =>
                 {
                     Owner.Attributes.Revert(Entities[holder]);
                     Entities.Remove(holder);
@@ -119,7 +119,7 @@ namespace Example_GroupCombined
 
             private Enum DynamicPickUp(CapabilityProcessData data)
             {
-                var combinedStrength = data.targets.Aggregate(0L,
+                var combinedStrength = data.actors.Aggregate(0L,
                     (acc, holder) => acc + holder.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
 
                 var remainingWeight = Owner.Attributes.GetAttributeValue(PhysicalAttributes.Weight);
@@ -129,13 +129,13 @@ namespace Example_GroupCombined
 
             private Enum DynamicPutdown(CapabilityProcessData data)
             {
-                if (Entities.Count == data.targets.Count) return State.Released;
+                if (Entities.Count == data.actors.Count) return State.Released;
 
-                var returnedWeight = Entities.Where(entity => data.targets.ConvertAll(e => e.Guid).Contains(entity.Key))
+                var returnedWeight = Entities.Where(entity => data.actors.ConvertAll(e => e.Guid).Contains(entity.Key))
                     .Aggregate(0L,
                         (acc, kvp) => acc + kvp.Value.GetAttributeValue(PhysicalAttributes.Weight));
 
-                var availableStrength = Entities.List.Where(entity => !data.targets.Contains(entity)).Aggregate(0L,
+                var availableStrength = Entities.List.Where(entity => !data.actors.Contains(entity)).Aggregate(0L,
                     (acc, holder) => acc + holder.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
 
                 return availableStrength >= -returnedWeight ? State.Aloft : State.Grappled;
@@ -217,15 +217,11 @@ namespace Example_GroupCombined
                 return data.targets.Count == 1;
             }
 
-            public PickUp() : base(new ICapabilityProcess[]
-            {
-                CapabilityTriggerProcess<LiftingState>.Get(LiftingState.Trigger.PickUp),
-                DelegateCheckProcess.IsTrue(NotAlreadyHolding),
+            public PickUp() : base(DelegateCheckProcess.IsTrue(NotAlreadyHolding),
                 DelegateCheckProcess.IsTrue(HasOneTarget),
-            }, new ICapabilityProcess[]
-            {
-                CapabilityTriggerProcess<LiftedState>.Get(LiftedState.Trigger.PickUp),
-            })
+                CapabilityTriggerProcess<LiftingState>.Get(LiftingState.Trigger.PickUp, DataSelect.Actors),
+                CapabilityTriggerProcess<LiftedState>.Get(LiftedState.Trigger.PickUp, DataSelect.Targets)
+            )
             {
             }
 
@@ -248,15 +244,11 @@ namespace Example_GroupCombined
                 return data.targets.Count == 1;
             }
 
-            public PutDown() : base(new ICapabilityProcess[]
-            {
-                CapabilityTriggerProcess<LiftingState>.Get(LiftingState.Trigger.PutDown),
-                DelegateCheckProcess.IsTrue(IsHoldingCheck),
+            public PutDown() : base(DelegateCheckProcess.IsTrue(IsHoldingCheck),
                 DelegateCheckProcess.IsTrue(HasTargets),
-            }, new ICapabilityProcess[]
-            {
-                CapabilityTriggerProcess<LiftedState>.Get(LiftedState.Trigger.PutDown),
-            })
+                CapabilityTriggerProcess<LiftingState>.Get(LiftingState.Trigger.PutDown, DataSelect.Actors), 
+                CapabilityTriggerProcess<LiftedState>.Get(LiftedState.Trigger.PutDown, DataSelect.Targets)
+            )
             {
             }
             

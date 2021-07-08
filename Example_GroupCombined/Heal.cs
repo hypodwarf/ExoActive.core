@@ -20,15 +20,12 @@ namespace Example_GroupCombined
 
             public void PerformAction(CapabilityProcessData data)
             {
-                var power = data.actors.Aggregate(0L, (acc, healer) => acc + healer.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
+                var power = data.actors.Sum(healer => healer.Attributes.GetAttributeValue(PhysicalAttributes.Strength));
                 data.targets.ForEach(receiver => receiver.Attributes.AdjustNamedModifier(PhysicalAttributes.Health, HEALING, power));
             }
         }
 
-        public Heal() : base(new ICapabilityProcess[]
-        {
-            new ImproveHealth()
-        }, new ICapabilityProcess[]{})
+        public Heal() : base(new ImproveHealth())
         {
         }
     }

@@ -1,5 +1,3 @@
-using System;
-using ExoActive;
 using NUnit.Framework;
 
 namespace Tests
@@ -9,9 +7,7 @@ namespace Tests
         [Test]
         public void CanCreate()
         {
-            var x = new ExoActive.Attribute("Jason", 1);
-            // var y = new ExoActive<bool, string>.Attribute("Rohman", "Hi");
-            // var z = new ExoActive<bool, Exception>.Attribute("Exception", new Exception());
+            var _ = new ExoActive.Attribute("Jason", 1);
             Assert.Pass();
         }
 

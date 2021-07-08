@@ -19,6 +19,14 @@ namespace ExoActive
         }
     }
 
+    [Flags]
+    public enum DataSelect : byte
+    {
+        Actors = 1 << 0,
+        Targets = 1 << 1,
+        Both = Actors | Targets
+    }
+
     public interface ICapability
     {
         public bool PassesRequirements(List<IEntity> actors, List<IEntity> targets);
@@ -31,71 +39,54 @@ namespace ExoActive
         public void PerformAction(CapabilityProcessData data);
     }
 
-    public class CapabilityStateProcess<TStateMachine> : ICapabilityProcess
-        where TStateMachine : EntityStateMachine, new()
-    {
-        public static Action<CapabilityProcessData> FireAction(Enum trigger)
-        {
-            // return data => data.subject.GetState<TStateMachine>().Fire(trigger, data);
-            return data => data.actors.ForEach(actor => actor.GetState<TStateMachine>().Fire(trigger, data));
-        }
-
-        // public static CapabilityStateProcess<S> CreateFireAction(Enum trigger)
-        // {
-        //     return Create(
-        //         new[]
-        //         {
-        //             FireAction(trigger)
-        //         },
-        //         new[]
-        //         {
-        //             StateRequirement<S>.Create(trigger)
-        //         });
-        // }
-
-        public static CapabilityStateProcess<TStateMachine> Create(
-            Action<CapabilityProcessData>[] actions, IRequirement.Check[] requirements)
-        {
-            var capabilityProcess = new CapabilityStateProcess<TStateMachine>();
-            foreach (var action in actions) capabilityProcess.ActionEvent += action;
-
-            foreach (var requirement in requirements) capabilityProcess.Requirements.Add(requirement);
-
-            return capabilityProcess;
-        }
-
-        protected event Action<CapabilityProcessData> ActionEvent;
-
-        protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
-
-        protected static TStateMachine GetState(IEntity entity)
-        {
-            return entity.GetState<TStateMachine>();
-        }
-
-        protected virtual TStateMachine CreateState()
-        {
-            return StateHelper<TStateMachine>.CreateState();
-        }
-
-        public bool PassesRequirements(CapabilityProcessData data)
-        {
-            // if (!data.subject.HasState<TStateMachine>()) data.subject.AddState(CreateState());
-            // return Requirements.All(req => req(data.subject, data));
-            
-            // Make sure all actors have the state
-            data.actors.ForEach(actor =>
-            {
-                if (!actor.HasState<TStateMachine>()) actor.AddState(CreateState());
-            });
-            return Requirements.All(req => req(data));
-        }
-
-        public virtual void PerformAction(CapabilityProcessData data)
-        {
-            ActionEvent?.Invoke(data);
-        }
-    }
+    // public class CapabilityStateProcess<TStateMachine> : ICapabilityProcess
+    //     where TStateMachine : EntityStateMachine, new()
+    // {
+    //     public static Action<CapabilityProcessData> FireAction(Enum trigger)
+    //     {
+    //         return data => data.actors.ForEach(actor => actor.GetState<TStateMachine>().Fire(trigger, data));
+    //     }
+    //
+    //     public static CapabilityStateProcess<TStateMachine> Create(
+    //         Action<CapabilityProcessData>[] actions, IRequirement.Check[] requirements)
+    //     {
+    //         var capabilityProcess = new CapabilityStateProcess<TStateMachine>();
+    //         foreach (var action in actions) capabilityProcess.ActionEvent += action;
+    //
+    //         foreach (var requirement in requirements) capabilityProcess.Requirements.Add(requirement);
+    //
+    //         return capabilityProcess;
+    //     }
+    //
+    //     protected event Action<CapabilityProcessData> ActionEvent;
+    //
+    //     protected readonly IList<IRequirement.Check> Requirements = new List<IRequirement.Check>();
+    //
+    //     protected static TStateMachine GetState(IEntity entity)
+    //     {
+    //         return entity.GetState<TStateMachine>();
+    //     }
+    //
+    //     protected virtual TStateMachine CreateState()
+    //     {
+    //         return StateHelper<TStateMachine>.CreateState();
+    //     }
+    //
+    //     public bool PassesRequirements(CapabilityProcessData data)
+    //     {
+    //         // Make sure all actors have the state
+    //         data.actors.ForEach(actor =>
+    //         {
+    //             if (!actor.HasState<TStateMachine>()) actor.AddState(CreateState());
+    //         });
+    //         return Requirements.All(req => req(data));
+    //     }
+    //
+    //     public virtual void PerformAction(CapabilityProcessData data)
+    //     {
+    //         ActionEvent?.Invoke(data);
+    //     }
+    // }
 
     /**
          * The CapabilityTriggerProcess runs as part of a Capaability. It is explicitly associated with a State and a Trigger.
@@ -105,43 +96,67 @@ namespace ExoActive
     public class CapabilityTriggerProcess<TStateMachine> : ICapabilityProcess
         where TStateMachine : EntityStateMachine, new()
     {
-        private static readonly Dictionary<Enum, CapabilityTriggerProcess<TStateMachine>> processes =
+        private static readonly Dictionary<(Enum, DataSelect), CapabilityTriggerProcess<TStateMachine>> processes =
             new();
 
-        public static CapabilityTriggerProcess<TStateMachine> Get(Enum trigger)
+        public static CapabilityTriggerProcess<TStateMachine> Get(Enum trigger, DataSelect selector)
         {
-            if (!processes.TryGetValue(trigger, out var process))
+            if (!processes.TryGetValue((trigger, selector), out var process))
             {
-                process = new CapabilityTriggerProcess<TStateMachine>(trigger);
-                processes[trigger] = process;
+                process = new CapabilityTriggerProcess<TStateMachine>(trigger, selector);
+                processes[(trigger, selector)] = process;
             }
 
             return process;
         }
 
         private readonly Enum trigger;
+        private readonly DataSelect selector;
         private readonly IRequirement.Check requirement;
 
-        private CapabilityTriggerProcess(Enum trigger)
+        private CapabilityTriggerProcess(Enum trigger, DataSelect selector)
         {
             this.trigger = trigger;
-            this.requirement = StateRequirement<TStateMachine>.Create(trigger);
+            this.selector = selector;
+            this.requirement = StateRequirement<TStateMachine>.Create(trigger, selector);
         }
 
         public bool PassesRequirements(CapabilityProcessData data)
         {
-            // Make sure all actors have the state
-            data.actors.ForEach(actor =>
+            
+            if (selector.HasFlag(DataSelect.Actors))
             {
-                if (!actor.HasState<TStateMachine>()) actor.AddState(StateHelper<TStateMachine>.CreateState());
-            });
+                // Make sure all actors have the state
+                data.actors.ForEach(actor =>
+                {
+                    if (!actor.HasState<TStateMachine>()) actor.AddState(StateHelper<TStateMachine>.CreateState());
+                });
+            }
+            
+            if (selector.HasFlag(DataSelect.Targets))
+            {
+                // Make sure all targets have the state
+                data.targets.ForEach(target =>
+                {
+                    if (!target.HasState<TStateMachine>()) target.AddState(StateHelper<TStateMachine>.CreateState());
+                });
+            }
+
+            ;
             return requirement(data);
         }
 
         public void PerformAction(CapabilityProcessData data)
         {
-            // data.subject.GetState<TStateMachine>().Fire(trigger, data);
-            data.actors.ForEach(actor => actor.GetState<TStateMachine>().Fire(trigger, data));
+            if (selector.HasFlag(DataSelect.Actors))
+            {
+                data.actors.ForEach(actor => actor.GetState<TStateMachine>().Fire(trigger, data));
+            }
+            
+            if (selector.HasFlag(DataSelect.Targets))
+            {
+                data.targets.ForEach(target => target.GetState<TStateMachine>().Fire(trigger, data));
+            }
         }
     }
 
@@ -220,23 +235,16 @@ namespace ExoActive
             return PerformAction<C>(actors.ToList(), targets.ToList());
         }
 
+        private readonly List<ICapabilityProcess> Actions = new();
 
-        private readonly List<ICapabilityProcess> actorActions = new();
-        private readonly List<ICapabilityProcess> targetActions = new();
-
-        protected Capability(ICapabilityProcess[] actorActions,
-            ICapabilityProcess[] targetActions = null)
+        protected Capability(params ICapabilityProcess[] Actions)
         {
-            this.actorActions.AddRange(actorActions);
-            this.targetActions.AddRange(targetActions ?? Array.Empty<ICapabilityProcess>());
+            this.Actions.AddRange(Actions);
         }
 
         public bool PassesRequirements(List<IEntity> actors, List<IEntity> targets = null)
         {
-            return actorActions.All(action => action.PassesRequirements(
-                           new CapabilityProcessData(actors, targets))) &&
-                   targetActions.All(action => action.PassesRequirements(
-                           new CapabilityProcessData(targets, actors)));
+            return Actions.All(action => action.PassesRequirements(new CapabilityProcessData(actors, targets)));
         }
 
         public bool PerformAction(List<IEntity> actors, List<IEntity> targets = null)
@@ -244,8 +252,7 @@ namespace ExoActive
             if (PassesRequirements(actors, targets))
             {
                 BeforeAction(actors, targets);
-                actorActions.ForEach(action => action.PerformAction(new CapabilityProcessData(actors, targets)));
-                targetActions.ForEach(action => action.PerformAction(new CapabilityProcessData(targets, actors)));
+                Actions.ForEach(action => action.PerformAction(new CapabilityProcessData(actors, targets)));
                 AfterAction(actors, targets);
                 return true;
             }
