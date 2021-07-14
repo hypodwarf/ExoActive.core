@@ -40,15 +40,30 @@ namespace Tests
             Assert.True(sadCharReq(data));
             Assert.False(notSadCharReq(data));
         }
-
+        
         [Test]
-        public void AttributesReqs()
+        public void AttributeReqs()
         {
             var entity = new TestEntity();
             var data = new CapabilityProcessData(new List<IEntity>{entity}, new List<IEntity>());
 
-            var lowStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, DataSelect.Actors, 10, LT);
-            var goodStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, DataSelect.Actors, 10, GTE);
+            var hasStrengthReq = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, DataSelect.Actors);
+            var doesNotHaveHealthReq = AttributeRequirement.Create(TestEntity.EntityAttributes.Health, DataSelect.Actors, false);
+            Assert.True(hasStrengthReq(data));
+            Assert.True(doesNotHaveHealthReq(data));
+
+            entity.Attributes.Add(TestEntity.EntityAttributes.Health);
+            Assert.False(doesNotHaveHealthReq(data));
+        }
+
+        [Test]
+        public void AttributeValueReqs()
+        {
+            var entity = new TestEntity();
+            var data = new CapabilityProcessData(new List<IEntity>{entity}, new List<IEntity>());
+
+            var lowStrength = AttributeValueRequirement.Create(TestEntity.EntityAttributes.Strength, DataSelect.Actors, 10, LT);
+            var goodStrength = AttributeValueRequirement.Create(TestEntity.EntityAttributes.Strength, DataSelect.Actors, 10, AttributeValueRequirement.Evaluation.GTE);
 
             Assert.False(lowStrength(data));
             Assert.True(goodStrength(data));

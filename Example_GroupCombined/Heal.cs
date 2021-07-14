@@ -8,14 +8,23 @@ namespace Example_GroupCombined
         private class ImproveHealth : ICapabilityProcess
         {
             private const string HEALING = "Healing";
+
+            private static readonly IRequirement.Check HealerIsAlive =
+                AttributeValueRequirement.Create(PhysicalAttributes.Health, DataSelect.Actors, 0,
+                    AttributeValueRequirement.Evaluation.GT);
+
+            private static readonly IRequirement.Check HealerHasStrength =
+                AttributeRequirement.Create(PhysicalAttributes.Strength, DataSelect.Actors);
+            
+            private static readonly IRequirement.Check RecieverHasHealth =
+                AttributeRequirement.Create(PhysicalAttributes.Health, DataSelect.Targets);
+            
             public bool PassesRequirements(CapabilityProcessData data)
             {
-                return data.actors.All(healer => 
-                           healer.Attributes.GetAttributeValue(PhysicalAttributes.Health) > 0 
-                           && healer.Attributes.Has(PhysicalAttributes.Strength)
-                       )
-                       && data.targets.Count == 1
-                       && data.targets.All(receiver => receiver.Attributes.Has(PhysicalAttributes.Health));
+                return data.targets.Count == 1 
+                       && HealerIsAlive(data)
+                       && HealerHasStrength(data)
+                       && RecieverHasHealth(data);
             }
 
             public void PerformAction(CapabilityProcessData data)

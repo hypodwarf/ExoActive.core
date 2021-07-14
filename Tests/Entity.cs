@@ -15,7 +15,8 @@ namespace Tests
 
         public enum EntityAttributes
         {
-            Strength
+            Strength,
+            Health
         }
 
         public TestEntity()
