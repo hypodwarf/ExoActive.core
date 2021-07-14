@@ -7,70 +7,17 @@ namespace ExoActive
     {
         public bool Passes(CapabilityProcessData data);
 
+        public bool Passes(IEntity entity, CapabilityProcessData data);
+
         public delegate bool Check(CapabilityProcessData data = default);
     }
 
-    public class TraitRequirement : IRequirement
+    public abstract class Requirement : IRequirement
     {
-        private readonly Enum Trait;
-        private readonly bool RequiredValue;
-
-        private TraitRequirement(Enum trait, bool requiredValue = true)
-        {
-            Trait = trait;
-            RequiredValue = requiredValue;
-        }
-
-        public bool Passes(CapabilityProcessData data)
-        {
-            return data.actors.All(actor => actor.Traits.Has(Trait) == RequiredValue);
-        }
-
-        public static IRequirement.Check Create(Enum trait, bool requiredValue = true)
-        {
-            var req = new TraitRequirement(trait, requiredValue);
-            return data => req.Passes(data);
-        }
-    }
-
-    public class AttributeRequirement : IRequirement
-    {
-        public delegate bool Evaluate(long value, long threshold);
-
-        private readonly Enum attribute;
-        private readonly long threshold;
-        private readonly Evaluate evaluation;
-
-        private AttributeRequirement(Enum attribute, long threshold, Evaluate evaluation)
-        {
-            this.attribute = attribute;
-            this.threshold = threshold;
-            this.evaluation = evaluation;
-        }
-
-        public bool Passes(CapabilityProcessData data)
-        {
-            return data.actors.All(actor => evaluation(actor.Attributes.GetAttributeValue(attribute), threshold));
-        }
-
-        public static IRequirement.Check Create(Enum attribute, long threshold, Evaluate evaluation)
-        {
-            var req = new AttributeRequirement(attribute, threshold, evaluation);
-            return data => req.Passes(data);
-        }
-    }
-
-    public class StateRequirement<TStateMachine> : IRequirement
-        where TStateMachine : EntityStateMachine, new()
-    {
-        private readonly Enum Trigger;
-        private readonly bool Permitted;
         private readonly DataSelect Selector;
 
-        private StateRequirement(Enum trigger, DataSelect selector, bool permitted = true)
+        protected Requirement(DataSelect selector)
         {
-            Trigger = trigger;
-            Permitted = permitted;
             Selector = selector;
         }
 
@@ -79,16 +26,79 @@ namespace ExoActive
             bool passes = true;
             if (Selector.HasFlag(DataSelect.Actors))
             {
-                passes = data.actors.All(actor => actor.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted);
+                passes = data.actors.All(actor => Passes(actor, data));
             }
             
             if (Selector.HasFlag(DataSelect.Targets))
             {
-                passes = passes && data.targets.All(target => target.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted);
+                passes = passes && data.targets.All(target => Passes(target, data));
             }
 
             return passes;
         }
+
+        public abstract bool Passes(IEntity entity, CapabilityProcessData data);
+    }
+
+    public class TraitRequirement : Requirement
+    {
+        private readonly Enum Trait;
+        private readonly bool RequiredValue;
+
+        private TraitRequirement(Enum trait, DataSelect selector, bool requiredValue = true) : base(selector)
+        {
+            Trait = trait;
+            RequiredValue = requiredValue;
+        }
+
+        public static IRequirement.Check Create(Enum trait, DataSelect selector, bool requiredValue = true)
+        {
+            var req = new TraitRequirement(trait, selector, requiredValue);
+            return data => req.Passes(data);
+        }
+
+        public override bool Passes(IEntity entity, CapabilityProcessData data) => entity.Traits.Has(Trait) == RequiredValue;
+    }
+
+    public class AttributeRequirement : Requirement
+    {
+        public delegate bool Evaluate(long value, long threshold);
+
+        private readonly Enum attribute;
+        private readonly long threshold;
+        private readonly Evaluate evaluation;
+
+        private AttributeRequirement(Enum attribute, DataSelect selector, long threshold, Evaluate evaluation) : base(selector)
+        {
+            this.attribute = attribute;
+            this.threshold = threshold;
+            this.evaluation = evaluation;
+        }
+
+        public override bool Passes(IEntity entity, CapabilityProcessData data) =>
+            evaluation(entity.Attributes.GetAttributeValue(attribute), threshold);
+
+        public static IRequirement.Check Create(Enum attribute, DataSelect selector, long threshold, Evaluate evaluation)
+        {
+            var req = new AttributeRequirement(attribute, selector, threshold, evaluation);
+            return data => req.Passes(data);
+        }
+    }
+
+    public class StateRequirement<TStateMachine> : Requirement
+        where TStateMachine : EntityStateMachine, new()
+    {
+        private readonly Enum Trigger;
+        private readonly bool Permitted;
+
+        private StateRequirement(Enum trigger, DataSelect selector, bool permitted = true) : base(selector)
+        {
+            Trigger = trigger;
+            Permitted = permitted;
+        }
+
+        public override bool Passes(IEntity entity, CapabilityProcessData data) =>
+            entity.IsPermittedTrigger<TStateMachine>(Trigger, data) == Permitted;
 
         public static IRequirement.Check Create(Enum trigger, DataSelect selector, bool permitted = true)
         {

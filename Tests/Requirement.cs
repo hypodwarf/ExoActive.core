@@ -25,10 +25,10 @@ namespace Tests
             var entity = new TestEntity();
             var data = new CapabilityProcessData(new List<IEntity>{entity}, new List<IEntity>());
 
-            var happyCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Happy);
-            var notHappyCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Happy, false);
-            var sadCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Sad);
-            var notSadCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Sad, false);
+            var happyCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Happy, DataSelect.Actors);
+            var notHappyCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Happy, DataSelect.Actors, false);
+            var sadCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Sad, DataSelect.Actors);
+            var notSadCharReq = TraitRequirement.Create(TestEntity.EntityTraits.Sad, DataSelect.Actors, false);
             Assert.True(happyCharReq(data));
             Assert.False(notHappyCharReq(data));
             Assert.False(sadCharReq(data));
@@ -47,8 +47,8 @@ namespace Tests
             var entity = new TestEntity();
             var data = new CapabilityProcessData(new List<IEntity>{entity}, new List<IEntity>());
 
-            var lowStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, 10, LT);
-            var goodStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, 10, GTE);
+            var lowStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, DataSelect.Actors, 10, LT);
+            var goodStrength = AttributeRequirement.Create(TestEntity.EntityAttributes.Strength, DataSelect.Actors, 10, GTE);
 
             Assert.False(lowStrength(data));
             Assert.True(goodStrength(data));
