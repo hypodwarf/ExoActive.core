@@ -3,6 +3,13 @@ using ExoActive;
 
 namespace Example_GroupCombined
 {
+    /***
+     * A battle to lift the rock!
+     * Two teams of actors. The first team to lift the rock wins! Actros can use their strength to help lift the rock,
+     * but they can also attack their oppenents, heal their team mates or pickup magical items are also available that
+     * increase the wearers strength.
+     */
+    
     class Program
     {
         static void PrintActors(params IEntity[] entities)

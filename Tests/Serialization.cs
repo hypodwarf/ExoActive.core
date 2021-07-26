@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using ExoActive;
 using JsonNetConverters;
@@ -8,6 +9,7 @@ using NUnit.Framework;
 
 namespace Tests
 {
+    [TestFixture]
     public class Serialization
     {
         private readonly JsonSerializerSettings jsonSerializeSettings = new()
@@ -19,6 +21,13 @@ namespace Tests
             },
             TypeNameHandling = TypeNameHandling.Auto
         };
+
+        [SetUp]
+        public void Setup()
+        {
+            // Clear out the Manager before each test
+            Manager.Entities = new ReadOnlyDictionary<Guid, Entity>(new Dictionary<Guid, Entity>());
+        }
 
         public T Deserialize<T>(string json)
         {

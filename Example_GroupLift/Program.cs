@@ -7,6 +7,9 @@ namespace Example_GroupLift
     {
         private static void Main(string[] args)
         {
+            Actor.Seed = 2004368288;
+            Console.WriteLine($"Seed: {Actor.Seed}");
+            
             IEntity[] actors = { new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor(), new Actor()};
             IEntity item1 = new Item();
             IEntity item2 = new Item();

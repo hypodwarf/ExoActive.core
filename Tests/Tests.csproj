@@ -15,6 +15,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Example_Effect\Example_Effect.csproj" />
+      <ProjectReference Include="..\Example_Equip\Example_Equip.csproj" />
+      <ProjectReference Include="..\Example_GroupCombined\Example_GroupCombined.csproj" />
+      <ProjectReference Include="..\Example_GroupLift\Example_GroupLift.csproj" />
       <ProjectReference Include="..\ExoActive\ExoActive.csproj" />
     </ItemGroup>
 
