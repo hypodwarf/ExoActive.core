@@ -120,10 +120,9 @@ namespace Tests
         public void EntitySerialization()
         {
             var entity = new TestEntity();
+            var data = new CapabilityProcessData(new List<IEntity>() {entity}, null);
 
-            var fill = Capability.Get<TestCapabilityFill>();
-
-            fill.PerformAction(new List<IEntity>() {entity});
+            Capability.PerformAction<TestCapabilityFill>(data);
             var jsonString = Serialize(entity);
 
             Console.WriteLine(jsonString);

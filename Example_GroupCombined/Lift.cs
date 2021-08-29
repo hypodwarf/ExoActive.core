@@ -225,10 +225,10 @@ namespace Example_GroupCombined
             {
             }
 
-            protected override void AfterAction(List<IEntity> actors, List<IEntity> targets)
+            protected override void AfterAction(CapabilityProcessData data)
             {
-                Console.WriteLine($"{actors.Count} Actors PICKUP Target [{targets[0].Guid}]");
-                targets.ForEach(DistributeTargetWeight);
+                Console.WriteLine($"{data.actors.Count} Actors PICKUP Target [{data.targets[0].Guid}]");
+                data.targets.ForEach(DistributeTargetWeight);
             }
         }
 
@@ -252,10 +252,10 @@ namespace Example_GroupCombined
             {
             }
             
-            protected override void AfterAction(List<IEntity> actors, List<IEntity> targets)
+            protected override void AfterAction(CapabilityProcessData data)
             {
-                Console.WriteLine($"{actors.Count} Actors PUTDOWN Target [{targets[0].Guid}]");
-                targets.ForEach(DistributeTargetWeight);
+                Console.WriteLine($"{data.actors.Count} Actors PUTDOWN Target [{data.targets[0].Guid}]");
+                data.targets.ForEach(DistributeTargetWeight);
             }
         }
     }

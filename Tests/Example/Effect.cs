@@ -25,12 +25,12 @@ namespace Tests.Example
             HealthCheck(team1, 100);
             HealthCheck(team2, 100);
             
-            Capability.Get<Attack>().PerformAction(team1.ToList(), team2.ToList());
+            Capability.PerformAction<Attack>(team1, team2);
             
             HealthCheck(team1, 100);
             HealthCheck(team2, 70);
             
-            Capability.Get<Heal>().PerformAction(team2.ToList(), team2.ToList());
+            Capability.PerformAction<Heal>(team2, team2);
             
             HealthCheck(team1, 100);
             HealthCheck(team2, 100);

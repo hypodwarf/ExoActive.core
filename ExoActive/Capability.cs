@@ -29,8 +29,8 @@ namespace ExoActive
 
     public interface ICapability
     {
-        public bool PassesRequirements(List<IEntity> actors, List<IEntity> targets);
-        public bool PerformAction(List<IEntity> actors, List<IEntity> targets);
+        public bool PassesRequirements(CapabilityProcessData data);
+        public bool PerformAction(CapabilityProcessData data);
     }
 
     public interface ICapabilityProcess
@@ -141,8 +141,7 @@ namespace ExoActive
                     if (!target.HasState<TStateMachine>()) target.AddState(StateHelper<TStateMachine>.CreateState());
                 });
             }
-
-            ;
+            
             return requirement(data);
         }
 
@@ -216,23 +215,22 @@ namespace ExoActive
             }
         }
 
-        public static bool PerformAction<TCapability>(List<IEntity> actors,
-            List<IEntity> targets = null)
+        public static bool PerformAction<TCapability>(CapabilityProcessData data)
             where TCapability : Capability, new()
         {
-            return Get<TCapability>().PerformAction(actors, targets);
+            return Get<TCapability>().PerformAction(data);
         }
 
         public static bool PerformAction<TCapability>(IEntity actor, params IEntity[] targets)
             where TCapability : Capability, new()
         {
-            return PerformAction<TCapability>(new List<IEntity> {actor}, targets.ToList());
+            return PerformAction<TCapability>(new CapabilityProcessData(new List<IEntity> {actor}, targets.ToList()));
         }
 
         public static bool PerformAction<C>(IEntity[] actors, params IEntity[] targets)
             where C : Capability, new()
         {
-            return PerformAction<C>(actors.ToList(), targets.ToList());
+            return PerformAction<C>(new CapabilityProcessData(actors.ToList(), targets.ToList()));
         }
 
         private readonly List<ICapabilityProcess> Actions = new();
@@ -242,34 +240,34 @@ namespace ExoActive
             this.Actions.AddRange(Actions);
         }
 
-        public bool PassesRequirements(List<IEntity> actors, List<IEntity> targets = null)
+        public bool PassesRequirements(CapabilityProcessData data)
         {
-            return Actions.All(action => action.PassesRequirements(new CapabilityProcessData(actors, targets)));
+            return Actions.All(action => action.PassesRequirements(data));
         }
 
-        public bool PerformAction(List<IEntity> actors, List<IEntity> targets = null)
+        public bool PerformAction(CapabilityProcessData data)
         {
-            if (PassesRequirements(actors, targets))
+            if (PassesRequirements(data))
             {
-                BeforeAction(actors, targets);
-                Actions.ForEach(action => action.PerformAction(new CapabilityProcessData(actors, targets)));
-                AfterAction(actors, targets);
+                BeforeAction(data);
+                Actions.ForEach(action => action.PerformAction(data));
+                AfterAction(data);
                 return true;
             }
 
             return false;
         }
 
-        public bool PerformAction(IEntity actor, params IEntity[] targets)
+        // public bool PerformAction(IEntity actor, params IEntity[] targets)
+        // {
+        //     return PerformAction(new List<IEntity> {actor}, targets.ToList());
+        // }
+
+        protected virtual void BeforeAction(CapabilityProcessData data)
         {
-            return PerformAction(new List<IEntity> {actor}, targets.ToList());
         }
 
-        protected virtual void BeforeAction(List<IEntity> actors, List<IEntity> targets)
-        {
-        }
-
-        protected virtual void AfterAction(List<IEntity> actors, List<IEntity> targets)
+        protected virtual void AfterAction(CapabilityProcessData data)
         {
         }
     }

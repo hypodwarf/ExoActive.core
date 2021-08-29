@@ -25,10 +25,10 @@ namespace Example_Effect
                 AttributeHelper.PrintAttributeTree(actor.Attributes[HealthAttributes.Health]);
             }
 
-            Capability.Get<Attack>().PerformAction(team1.ToList(), team2.ToList());
-            Capability.Get<Attack>().PerformAction(team1.ToList(), team2.ToList());
-            Capability.Get<Attack>().PerformAction(team1.ToList(), team2.ToList());
-            Capability.Get<Heal>().PerformAction(team2.ToList(), team2.ToList());
+            Capability.PerformAction<Attack>(team1, team2);
+            Capability.PerformAction<Attack>(team1, team2);
+            Capability.PerformAction<Attack>(team1, team2);
+            Capability.PerformAction<Heal>(team2, team2);
             
             Console.WriteLine("--- Team 1 ---");
             foreach (var actor in team1)
